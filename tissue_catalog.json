@@ -1,0 +1,343 @@
+{
+  "tissues": {
+    "CV-TISSUE-010": {
+      "id": "CV-TISSUE-010",
+      "name": "Multi-Algorithm Feature Matching Engine",
+      "file_path": "tissues/computer_vision/feature_matching/CV-TISSUE-010_feature_matcher.py",
+      "category": "computer_vision/feature_matching",
+      "tags": [
+        "feature-matching",
+        "sift",
+        "orb",
+        "homography",
+        "keypoints"
+      ],
+      "difficulty": "Advanced",
+      "type": "CONNECTIVE"
+    },
+    "CV-TISSUE-004": {
+      "id": "CV-TISSUE-004",
+      "name": "Multi-Algorithm Edge Detection",
+      "file_path": "tissues/computer_vision/feature_extraction/CV-TISSUE-004_edge_detector.py",
+      "category": "computer_vision/feature_extraction",
+      "tags": [
+        "edge-detection",
+        "canny",
+        "sobel",
+        "feature-extraction"
+      ],
+      "difficulty": "Intermediate",
+      "type": "FUNCTIONAL"
+    },
+    "CV-TISSUE-007": {
+      "id": "CV-TISSUE-007",
+      "name": "Semantic Segmentation Engine",
+      "file_path": "tissues/computer_vision/segmentation/CV-TISSUE-007_semantic_segmenter.py",
+      "category": "computer_vision/segmentation",
+      "tags": [
+        "segmentation",
+        "semantic",
+        "deep-learning",
+        "masking",
+        "pixel-classification"
+      ],
+      "difficulty": "Advanced",
+      "type": "FUNCTIONAL"
+    },
+    "CV-TISSUE-008": {
+      "id": "CV-TISSUE-008",
+      "name": "Advanced Image Augmentation Suite",
+      "file_path": "tissues/computer_vision/transformation/CV-TISSUE-008_image_augmenter.py",
+      "category": "computer_vision/transformation",
+      "tags": [
+        "augmentation",
+        "data-augmentation",
+        "transforms",
+        "training",
+        "preprocessing"
+      ],
+      "difficulty": "Intermediate",
+      "type": "ENERGETIC"
+    },
+    "CV-TISSUE-001": {
+      "id": "CV-TISSUE-001",
+      "name": "Fast Face Detection with Multiple Backends",
+      "file_path": "tissues/computer_vision/detection/CV-TISSUE-001_face_detector.py",
+      "category": "computer_vision/detection",
+      "tags": [
+        "face-detection",
+        "opencv",
+        "real-time",
+        "edge-compatible"
+      ],
+      "difficulty": "Intermediate",
+      "type": "FUNCTIONAL"
+    },
+    "CV-TISSUE-006": {
+      "id": "CV-TISSUE-006",
+      "name": "Multi-Algorithm Object Tracker",
+      "file_path": "tissues/computer_vision/tracking/CV-TISSUE-006_object_tracker.py",
+      "category": "computer_vision/tracking",
+      "tags": [
+        "tracking",
+        "object-tracking",
+        "kalman",
+        "real-time",
+        "video"
+      ],
+      "difficulty": "Advanced",
+      "type": "FUNCTIONAL"
+    },
+    "CV-TISSUE-005": {
+      "id": "CV-TISSUE-005",
+      "name": "Smart Region Blur for Privacy Protection",
+      "file_path": "tissues/computer_vision/effects/CV-TISSUE-005_blur_regions.py",
+      "category": "computer_vision/effects",
+      "tags": [
+        "blur",
+        "privacy",
+        "gaussian",
+        "pixelate",
+        "effects"
+      ],
+      "difficulty": "Beginner",
+      "type": "ENERGETIC"
+    },
+    "CV-TISSUE-009": {
+      "id": "CV-TISSUE-009",
+      "name": "Advanced Color Analysis Engine",
+      "file_path": "tissues/computer_vision/analysis/CV-TISSUE-009_color_analyzer.py",
+      "category": "computer_vision/analysis",
+      "tags": [
+        "color-analysis",
+        "histogram",
+        "dominant-colors",
+        "palette",
+        "color-space"
+      ],
+      "difficulty": "Intermediate",
+      "type": "STRUCTURAL"
+    },
+    "CV-TISSUE-003": {
+      "id": "CV-TISSUE-003",
+      "name": "Result Aggregator for Multi-Stage CV Pipelines",
+      "file_path": "tissues/computer_vision/connective/CV-TISSUE-003_result_aggregator.py",
+      "category": "computer_vision/connective",
+      "tags": [
+        "aggregator",
+        "pipeline",
+        "connector",
+        "results"
+      ],
+      "difficulty": "Beginner",
+      "type": "CONNECTIVE"
+    },
+    "CV-TISSUE-002": {
+      "id": "CV-TISSUE-002",
+      "name": "Smart Image Normalizer for CV Pipeline",
+      "file_path": "tissues/computer_vision/preprocessing/CV-TISSUE-002_image_normalizer.py",
+      "category": "computer_vision/preprocessing",
+      "tags": [
+        "preprocessing",
+        "normalization",
+        "edge-compatible",
+        "optimization"
+      ],
+      "difficulty": "Beginner",
+      "type": "STRUCTURAL"
+    },
+    "NLP-TISSUE-001": {
+      "id": "NLP-TISSUE-001",
+      "name": "Multi-Strategy Text Tokenizer",
+      "file_path": "tissues/nlp/tokenization/NLP-TISSUE-001_text_tokenizer.py",
+      "category": "nlp/tokenization",
+      "tags": [
+        "tokenization",
+        "text-processing",
+        "nlp",
+        "preprocessing",
+        "word-splitting"
+      ],
+      "difficulty": "Beginner",
+      "type": "FUNCTIONAL"
+    },
+    "NLP-TISSUE-002": {
+      "id": "NLP-TISSUE-002",
+      "name": "Multi-Language Stop Words Remover",
+      "file_path": "tissues/nlp/preprocessing/NLP-TISSUE-002_stop_words_remover.py",
+      "category": "nlp/preprocessing",
+      "tags": [
+        "stop-words",
+        "text-cleaning",
+        "nlp",
+        "preprocessing",
+        "multi-language"
+      ],
+      "difficulty": "Beginner",
+      "type": "FUNCTIONAL"
+    }
+  },
+  "metrics": {
+    "CV-TISSUE-010": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-004": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-007": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-008": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-001": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-006": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-005": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-009": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-003": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "CV-TISSUE-002": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "NLP-TISSUE-001": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    },
+    "NLP-TISSUE-002": {
+      "usage_count": 0,
+      "avg_execution_time": 0.0,
+      "success_rate": 1.0,
+      "last_used": null,
+      "avg_rating": 0.0,
+      "rating_count": 0
+    }
+  },
+  "relationships": {},
+  "statistics": {
+    "total_tissues": 12,
+    "total_categories": 12,
+    "total_tags": 50,
+    "categories": [
+      "computer_vision/feature_matching",
+      "computer_vision/feature_extraction",
+      "computer_vision/segmentation",
+      "computer_vision/transformation",
+      "computer_vision/detection",
+      "computer_vision/tracking",
+      "computer_vision/effects",
+      "computer_vision/analysis",
+      "computer_vision/connective",
+      "computer_vision/preprocessing",
+      "nlp/tokenization",
+      "nlp/preprocessing"
+    ],
+    "most_used_tissues": [
+      [
+        "CV-TISSUE-010",
+        0
+      ],
+      [
+        "CV-TISSUE-004",
+        0
+      ],
+      [
+        "CV-TISSUE-007",
+        0
+      ],
+      [
+        "CV-TISSUE-008",
+        0
+      ],
+      [
+        "CV-TISSUE-001",
+        0
+      ],
+      [
+        "CV-TISSUE-006",
+        0
+      ],
+      [
+        "CV-TISSUE-005",
+        0
+      ],
+      [
+        "CV-TISSUE-009",
+        0
+      ],
+      [
+        "CV-TISSUE-003",
+        0
+      ],
+      [
+        "CV-TISSUE-002",
+        0
+      ]
+    ],
+    "highest_rated_tissues": [],
+    "total_usage": 0
+  },
+  "export_date": "2025-06-26T13:06:16.180119"
+}

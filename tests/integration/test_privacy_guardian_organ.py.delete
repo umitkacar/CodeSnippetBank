@@ -1,0 +1,405 @@
+"""
+Integration tests for Privacy Guardian Organ.
+
+Tests the emergent behaviors when combining:
+- Face Detection (CV-TISSUE-001)
+- Blur Regions (CV-TISSUE-005)
+- Object Tracking (CV-TISSUE-006)
+"""
+
+import pytest
+import numpy as np
+import cv2
+import sys
+import os
+from typing import List, Tuple
+import time
+
+# Add organs to path
+organs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../organs/computer_vision')
+sys.path.append(organs_path)
+
+from CV_ORGAN_002_privacy_guardian_system import (
+    PrivacyGuardianSystem, PrivacyProfile, TrackedFace,
+    anonymize_video_file, create_privacy_pipeline
+)
+
+
+class TestPrivacyGuardianIntegration:
+    """Test Privacy Guardian organ integration"""
+    
+    @pytest.fixture
+    def guardian(self):
+        """Create Privacy Guardian instance"""
+        return PrivacyGuardianSystem(
+            blur_strength=0.8,
+            track_persistence=30,
+            expand_regions=1.2
+        )
+    
+    @pytest.fixture
+    def test_video_frames(self):
+        """Generate synthetic video frames with moving faces"""
+        frames = []
+        width, height = 640, 480
+        num_frames = 30
+        
+        for i in range(num_frames):
+            frame = np.ones((height, width, 3), dtype=np.uint8) * 200
+            
+            # Moving face 1 (horizontal)
+            x1 = 100 + i * 10
+            cv2.rectangle(frame, (x1, 100), (x1 + 80, 200), (100, 150, 200), -1)
+            cv2.circle(frame, (x1 + 40, 150), 30, (50, 100, 150), -1)  # "face"
+            
+            # Moving face 2 (vertical)
+            y2 = 50 + i * 5
+            cv2.rectangle(frame, (400, y2), (480, y2 + 80), (200, 150, 100), -1)
+            cv2.circle(frame, (440, y2 + 40), 30, (150, 100, 50), -1)  # "face"
+            
+            frames.append(frame)
+        
+        return frames
+    
+    def test_organ_initialization(self, guardian):
+        """Test proper initialization of all tissues"""
+        assert guardian.face_detector is not None
+        assert guardian.tracker is not None
+        assert guardian.blurrer is not None
+        assert guardian.profile.blur_strength == 0.8
+        assert guardian.profile.track_persistence == 30
+    
+    def test_single_frame_processing(self, guardian):
+        """Test processing a single frame"""
+        # Create test frame
+        frame = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        cv2.rectangle(frame, (100, 100), (200, 250), (0, 0, 255), -1)
+        
+        # Process frame
+        result = guardian.process_frame(frame)
+        
+        assert result is not None
+        assert result.shape == frame.shape
+        assert guardian.stats["frames_processed"] == 1
+    
+    def test_multi_frame_tracking(self, guardian, test_video_frames):
+        """Test tracking across multiple frames"""
+        tracked_ids = set()
+        
+        for i, frame in enumerate(test_video_frames[:10]):
+            result = guardian.process_frame(frame)
+            
+            # Collect tracked IDs
+            for face in guardian.tracked_faces.values():
+                tracked_ids.add(face.track_id)
+            
+            # Verify tracking
+            if i > 3:  # After initialization
+                assert len(guardian.tracked_faces) > 0
+                assert guardian.stats["active_tracks"] > 0
+        
+        # Should have tracked multiple unique faces
+        assert len(tracked_ids) >= 2
+    
+    def test_blur_application(self, guardian):
+        """Test that blur is correctly applied to detected faces"""
+        # Create frame with clear face region
+        frame = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        face_region = frame[100:250, 100:200].copy()
+        
+        # Make face region distinctive
+        frame[100:250, 100:200] = [255, 0, 0]  # Red face
+        
+        # Process with detection only (no blur)
+        preview = guardian.process_frame(frame, detect_only=True)
+        
+        # Process with blur
+        protected = guardian.process_frame(frame, detect_only=False)
+        
+        # The protected frame should have blurred regions
+        if len(guardian.tracked_faces) > 0:
+            # Get a tracked face region
+            for face in guardian.tracked_faces.values():
+                x, y, w, h = face.bbox
+                if w > 0 and h > 0:
+                    # Extract regions
+                    original_region = frame[y:y+h, x:x+w]
+                    protected_region = protected[y:y+h, x:x+w]
+                    
+                    # Blurred region should be different
+                    diff = np.mean(np.abs(original_region - protected_region))
+                    assert diff > 0  # Some change occurred
+    
+    def test_privacy_levels(self, guardian):
+        """Test different privacy level presets"""
+        frame = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        
+        levels = ["low", "medium", "high", "maximum"]
+        blur_strengths = []
+        
+        for level in levels:
+            guardian.set_privacy_level(level)
+            blur_strengths.append(guardian.profile.blur_strength)
+            
+            # Process frame
+            result = guardian.process_frame(frame)
+            assert result is not None
+        
+        # Verify increasing blur strengths
+        assert blur_strengths[0] < blur_strengths[1]
+        assert blur_strengths[1] < blur_strengths[2]
+        assert blur_strengths[2] <= blur_strengths[3]
+    
+    def test_performance_optimization(self, guardian, test_video_frames):
+        """Test smart detection intervals for performance"""
+        detection_counts = []
+        
+        # Process frames and track when detection runs
+        for i, frame in enumerate(test_video_frames):
+            initial_detected = guardian.stats.get("total_faces_detected", 0)
+            guardian.process_frame(frame)
+            final_detected = guardian.stats.get("total_faces_detected", 0)
+            
+            if final_detected > initial_detected:
+                detection_counts.append(i)
+        
+        # Should not detect every frame (performance optimization)
+        assert len(detection_counts) < len(test_video_frames)
+        
+        # But should detect regularly
+        assert len(detection_counts) >= len(test_video_frames) // 5
+    
+    def test_tracking_persistence(self, guardian):
+        """Test that tracks persist when faces temporarily disappear"""
+        # Frame 1: Face present
+        frame1 = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        cv2.rectangle(frame1, (100, 100), (200, 200), (255, 0, 0), -1)
+        
+        # Frame 2-5: Face absent
+        frame_empty = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        
+        # Frame 6: Face returns
+        frame6 = frame1.copy()
+        
+        # Process sequence
+        guardian.process_frame(frame1)
+        initial_tracks = len(guardian.tracked_faces)
+        
+        # Process empty frames
+        for _ in range(4):
+            guardian.process_frame(frame_empty)
+        
+        # Tracks should persist
+        assert len(guardian.tracked_faces) == initial_tracks
+        
+        # Process frame with face again
+        guardian.process_frame(frame6)
+        
+        # Should maintain same track (not create new)
+        assert len(guardian.tracked_faces) == initial_tracks
+    
+    def test_adaptive_blur_strength(self):
+        """Test adaptive blur based on face size"""
+        guardian = PrivacyGuardianSystem(
+            profile=PrivacyProfile(adaptive_blur=True, blur_strength=0.7)
+        )
+        
+        # Create frames with different face sizes
+        frame_small = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        frame_large = np.ones((480, 640, 3), dtype=np.uint8) * 255
+        
+        # Small face
+        cv2.rectangle(frame_small, (100, 100), (130, 130), (255, 0, 0), -1)
+        
+        # Large face
+        cv2.rectangle(frame_large, (100, 100), (400, 400), (255, 0, 0), -1)
+        
+        # Process frames
+        result_small = guardian.process_frame(frame_small)
+        stats_small = guardian.get_statistics()
+        
+        guardian_large = PrivacyGuardianSystem(
+            profile=PrivacyProfile(adaptive_blur=True, blur_strength=0.7)
+        )
+        result_large = guardian_large.process_frame(frame_large)
+        stats_large = guardian_large.get_statistics()
+        
+        # Both should process successfully
+        assert result_small is not None
+        assert result_large is not None
+    
+    def test_statistics_and_reporting(self, guardian, test_video_frames):
+        """Test comprehensive statistics gathering"""
+        # Process multiple frames
+        for frame in test_video_frames[:10]:
+            guardian.process_frame(frame)
+        
+        # Get statistics
+        stats = guardian.get_statistics()
+        
+        # Verify statistics
+        assert stats["frames_processed"] == 10
+        assert stats["fps"] > 0
+        assert "total_faces_detected" in stats
+        assert "total_faces_blurred" in stats
+        assert "detector_stats" in stats
+        assert "tracker_stats" in stats
+        assert "blurrer_stats" in stats
+        
+        # Get detailed report
+        report = guardian.export_blur_report()
+        
+        assert "summary" in report
+        assert "privacy_profile" in report
+        assert "tracked_faces" in report
+        assert isinstance(report["tracked_faces"], list)
+    
+    def test_emergent_behavior_consistent_anonymization(self, guardian):
+        """Test emergent behavior: consistent anonymization across frames"""
+        # Create video with face that moves in circle
+        frames = []
+        tracked_positions = []
+        
+        for i in range(20):
+            frame = np.ones((480, 640, 3), dtype=np.uint8) * 255
+            
+            # Circular motion
+            angle = (i / 20) * 2 * np.pi
+            cx = int(320 + 100 * np.cos(angle))
+            cy = int(240 + 100 * np.sin(angle))
+            
+            # Draw face
+            cv2.rectangle(frame, (cx-40, cy-40), (cx+40, cy+40), (255, 0, 0), -1)
+            frames.append(frame)
+            tracked_positions.append((cx, cy))
+        
+        # Process all frames
+        blur_applied_count = 0
+        
+        for frame in frames:
+            result = guardian.process_frame(frame)
+            
+            # Check if blur was applied
+            for face in guardian.tracked_faces.values():
+                if face.blur_applied:
+                    blur_applied_count += 1
+                    face.blur_applied = False  # Reset for counting
+        
+        # Should have consistently applied blur
+        assert blur_applied_count >= len(frames) * 0.8  # At least 80% coverage
+        
+        # Should maintain track throughout motion
+        assert len(guardian.tracked_faces) <= 2  # Should not create many tracks for one face
+    
+    def test_pipeline_creation_from_config(self):
+        """Test creating custom pipeline from configuration"""
+        config = {
+            "profile": {
+                "blur_strength": 0.9,
+                "blur_method": "pixelate",
+                "expand_ratio": 1.5,
+                "track_persistence": 40,
+                "adaptive_blur": True
+            },
+            "detection_backend": "haar",
+            "tracking_algorithm": "centroid"
+        }
+        
+        guardian = create_privacy_pipeline(config)
+        
+        assert guardian.profile.blur_strength == 0.9
+        assert guardian.profile.blur_method == "pixelate"
+        assert guardian.profile.expand_ratio == 1.5
+        assert guardian.face_detector.backend == "haar"
+        assert guardian.tracker.algorithm == "centroid"
+    
+    @pytest.mark.performance
+    def test_real_time_performance(self, guardian, test_video_frames):
+        """Test that processing maintains real-time performance"""
+        processing_times = []
+        
+        # Warm up
+        for frame in test_video_frames[:5]:
+            guardian.process_frame(frame)
+        
+        # Measure performance
+        for frame in test_video_frames[5:]:
+            start = time.time()
+            guardian.process_frame(frame)
+            elapsed = time.time() - start
+            processing_times.append(elapsed)
+        
+        avg_time = np.mean(processing_times)
+        fps = 1.0 / avg_time
+        
+        # Should maintain at least 15 FPS for real-time
+        assert fps >= 15, f"Performance too low: {fps:.1f} FPS"
+        
+        # 90th percentile should also be reasonable
+        p90_time = np.percentile(processing_times, 90)
+        p90_fps = 1.0 / p90_time
+        assert p90_fps >= 10, f"P90 performance too low: {p90_fps:.1f} FPS"
+
+
+def test_integration_workflow():
+    """Test complete integration workflow"""
+    print("Testing Privacy Guardian integration workflow...")
+    
+    # Create guardian
+    guardian = PrivacyGuardianSystem()
+    
+    # Create test scenario
+    width, height = 640, 480
+    scenario_frames = []
+    
+    # Scenario: Two people walking past each other
+    for i in range(30):
+        frame = np.ones((height, width, 3), dtype=np.uint8) * 220
+        
+        # Person 1: walks left to right
+        x1 = 50 + i * 15
+        if x1 < width - 100:
+            cv2.rectangle(frame, (x1, 200), (x1 + 80, 350), (100, 150, 200), -1)
+            cv2.circle(frame, (x1 + 40, 250), 35, (50, 100, 150), -1)
+        
+        # Person 2: walks right to left
+        x2 = width - 50 - i * 15
+        if x2 > 100:
+            cv2.rectangle(frame, (x2 - 80, 200), (x2, 350), (200, 150, 100), -1)
+            cv2.circle(frame, (x2 - 40, 250), 35, (150, 100, 50), -1)
+        
+        scenario_frames.append(frame)
+    
+    # Process scenario
+    print("Processing scenario...")
+    results = []
+    
+    for i, frame in enumerate(scenario_frames):
+        result = guardian.process_frame(frame)
+        results.append(result)
+        
+        if i % 10 == 0:
+            stats = guardian.get_statistics()
+            print(f"Frame {i}: Tracks={stats['active_tracks']}, "
+                  f"FPS={stats.get('fps', 0):.1f}")
+    
+    # Final report
+    report = guardian.export_blur_report()
+    print(f"\nFinal Report:")
+    print(f"- Total frames: {report['summary']['frames_processed']}")
+    print(f"- Faces blurred: {report['summary']['total_faces_blurred']}")
+    print(f"- Unique tracks: {len(report['tracked_faces'])}")
+    print(f"- Avg FPS: {report['summary'].get('fps', 0):.1f}")
+    
+    assert len(results) == len(scenario_frames)
+    assert report['summary']['frames_processed'] == len(scenario_frames)
+    
+    print("\nIntegration test completed successfully!")
+
+
+if __name__ == "__main__":
+    # Run integration workflow
+    test_integration_workflow()
+    
+    # Run pytest for detailed tests
+    pytest.main([__file__, "-v", "--tb=short"])

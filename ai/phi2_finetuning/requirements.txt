@@ -1,0 +1,41 @@
+# Core dependencies for Phi-2 fine-tuning
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+accelerate>=0.24.0
+peft>=0.6.0  # Parameter-efficient fine-tuning
+bitsandbytes>=0.41.0  # Quantization support
+
+# Training and monitoring
+wandb>=0.15.0
+tensorboard>=2.14.0
+tqdm>=4.66.0
+
+# Optimization and deployment
+onnx>=1.14.0
+onnxruntime>=1.16.0
+onnxruntime-gpu>=1.16.0  # Optional: for GPU inference
+tensorrt>=8.6.0  # Optional: for NVIDIA optimization
+
+# Edge deployment
+tflite-runtime>=2.13.0  # For mobile deployment
+coremltools>=7.0  # For iOS deployment
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Quality assurance
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.1.0
+
+# Utilities
+python-dotenv>=1.0.0
+click>=8.1.0
+rich>=13.5.0  # Pretty printing
+
+# Optional: For extreme quantization
+# llama-cpp-python>=0.2.0  # 4-bit quantization
+# auto-gptq>=0.4.0  # GPTQ quantization
