@@ -1,0 +1,83 @@
+# ResourceQuota for namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: development
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "10"
+    requests.storage: 100Gi
+---
+# ResourceQuota for object counts
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-quota
+  namespace: development
+spec:
+  hard:
+    pods: "50"
+    services: "10"
+    services.loadbalancers: "2"
+    services.nodeports: "5"
+    configmaps: "20"
+    secrets: "20"
+    persistentvolumeclaims: "10"
+---
+# LimitRange for default resource limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: resource-limits
+  namespace: development
+spec:
+  limits:
+  # Container defaults
+  - type: Container
+    default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    max:
+      cpu: "2"
+      memory: 2Gi
+    min:
+      cpu: 50m
+      memory: 64Mi
+  # Pod defaults
+  - type: Pod
+    max:
+      cpu: "4"
+      memory: 4Gi
+  # PVC defaults
+  - type: PersistentVolumeClaim
+    min:
+      storage: 1Gi
+    max:
+      storage: 10Gi
+---
+# Priority class for critical workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000
+globalDefault: false
+description: "High priority for critical services"
+---
+# Priority class for low priority jobs
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 100
+globalDefault: false
+description: "Low priority for batch jobs"
+preemptionPolicy: Never

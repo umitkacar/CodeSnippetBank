@@ -1,0 +1,48 @@
+# PodDisruptionBudget with minAvailable
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-app-pdb
+  namespace: production
+spec:
+  minAvailable: 2  # Always keep at least 2 pods available
+  selector:
+    matchLabels:
+      app: web-app
+---
+# PodDisruptionBudget with maxUnavailable
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-server-pdb
+  namespace: production
+spec:
+  maxUnavailable: 1  # Allow max 1 pod to be unavailable
+  selector:
+    matchLabels:
+      app: api-server
+---
+# PodDisruptionBudget with percentage
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: worker-pdb
+  namespace: production
+spec:
+  minAvailable: 50%  # Keep at least 50% of pods available
+  selector:
+    matchLabels:
+      app: worker
+---
+# PodDisruptionBudget for critical service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: database-pdb
+  namespace: database
+spec:
+  maxUnavailable: 0  # Don't allow any voluntary disruptions
+  selector:
+    matchLabels:
+      app: postgres
+      role: primary

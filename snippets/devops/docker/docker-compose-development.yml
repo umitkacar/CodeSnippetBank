@@ -1,0 +1,75 @@
+version: '3.8'
+
+# Development environment with hot-reload and debugging
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:delegated
+      - ./public:/app/public:delegated
+      # Node modules as named volume for performance
+      - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+      - "9229:9229" # Node.js debug port
+    environment:
+      - NODE_ENV=development
+      - DEBUG=*
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev
+    stdin_open: true
+    tty: true
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./api/src:/app/src:delegated
+      - api_node_modules:/app/node_modules
+    ports:
+      - "4000:4000"
+      - "9230:9229"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://dev:devpass@postgres:5432/devdb
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    command: npm run dev
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_DB=devdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080" # Web UI
+      - "1025:1025" # SMTP
+
+volumes:
+  node_modules:
+  api_node_modules:
+  postgres_data:
+  redis_data:

@@ -40,11 +40,11 @@
 
 ---
 
-## 🚀 Transform Edge AI Development
+## 🚀 The Ultimate Code Snippet Library
 
-> **95% fewer tokens. 100% production quality. Zero compromises.**
+> **1,000+ Production-Ready Snippets. 10 Categories. Zero Learning Curve.**
 
-CodeSnippetBank revolutionizes how Edge LLMs generate code. Our biological code organization system enables small Edge LLMs (1-7B parameters) to generate enterprise-grade code with minimal token usage—making sophisticated AI possible on devices as small as ESP32 microcontrollers.
+CodeSnippetBank is the most comprehensive code snippet library for modern developers. With **1,029+ production-ready code files** across AI/ML, Web3, Frontend, Backend, Mobile, DevOps, Data Science, Testing, Security, and Database—you'll never write boilerplate code from scratch again.
 
 <div align="center">
 
@@ -56,23 +56,23 @@ CodeSnippetBank revolutionizes how Edge LLMs generate code. Our biological code 
 <tr>
 <td align="center" width="33%">
 
-### 🎯 **Ultra Efficient**
-**95% Token Reduction**
-Generate quality code in <100 tokens instead of 2000+
+### 🎯 **1,029+ Snippets**
+**Production-Ready Code**
+Copy, paste, and customize in seconds
 
 </td>
 <td align="center" width="33%">
 
-### 🌐 **Edge-First**
-**Offline Ready**
-Deploy on ESP32, Raspberry Pi, smartphones—no internet required
+### 🌐 **10 Categories**
+**All Tech Stacks**
+AI/ML, Web3, Frontend, Backend, Mobile, DevOps, Data Science, Testing, Security, Database
 
 </td>
 <td align="center" width="33%">
 
-### 💎 **Quality Guaranteed**
-**Benchmarked & Tested**
-Every tissue validated on 15+ device profiles
+### 💎 **2024-2025 Trending**
+**Latest Technologies**
+GPT-4, Next.js 14, Solidity, Kubernetes, and more
 
 </td>
 </tr>
@@ -80,17 +80,24 @@ Every tissue validated on 15+ device profiles
 
 ---
 
-## 📊 Performance That Speaks
+## 📊 What's Inside
 
 <div align="center">
 
-| Metric | 🔴 Traditional | 🟢 CodeSnippetBank | 🎯 Improvement |
-|:-------|:---------------|:-------------------|:---------------|
-| **Token Usage** | 2000-5000 | 50-100 | **40-100x** ⚡ |
-| **Code Quality** | Variable | Guaranteed | **100%** 💎 |
-| **Edge Performance** | Unknown | Documented | **∞** 📊 |
-| **Deployment Size** | 100MB-1GB | 1-10MB | **10-1000x** 📦 |
-| **Offline Support** | Limited | Full | **100%** 🌐 |
+| Category | 📁 Snippets | 🛠️ Technologies | 🎯 Use Cases |
+|:---------|:------------|:---------------|:------------|
+| **🤖 AI/ML** | 200+ | GPT-4, LLaMA, YOLO, Stable Diffusion | LLMs, Computer Vision, NLP, Generative AI |
+| **🌐 Frontend** | 234 | React, Next.js 14, Vue, Svelte | Hooks, Components, Animations, SSR |
+| **⚙️ Backend** | 200+ | FastAPI, tRPC, GraphQL, Prisma | APIs, Auth, Database, WebSocket |
+| **🔗 Web3** | 105 | Solidity, ethers.js, wagmi | Smart Contracts, DApps, DeFi |
+| **🔧 DevOps** | 104 | Docker, Kubernetes, GitHub Actions | CI/CD, Monitoring, Infrastructure |
+| **📊 Data Science** | 721 | Pandas, NumPy, Matplotlib, Scikit-learn | Data Analysis, Visualization, ML |
+| **📱 Mobile** | 104 | React Native, Flutter, Swift, Kotlin | Navigation, State, Animations |
+| **🧪 Testing** | 102 | Jest, Playwright, Cypress, Pytest | Unit, Integration, E2E |
+| **🔐 Security** | 107 | JWT, OAuth2, Encryption | Authentication, Security, Best Practices |
+| **💾 Database** | 388 | PostgreSQL, MongoDB, Redis, Prisma | SQL, NoSQL, ORM, Optimization |
+
+**Total: 1,029+ Production-Ready Code Files** 🎉
 
 </div>
 
@@ -236,10 +243,10 @@ graph LR
 
 ---
 
-## 🧬 Available Tissues
+## 📦 Code Snippet Categories
 
 <details open>
-<summary><h3>🤖 AI & Machine Learning (50+ Tissues)</h3></summary>
+<summary><h3>🤖 AI & Machine Learning (200+ Snippets)</h3></summary>
 
 #### 🌟 **2024-2025 Trending**
 
@@ -275,7 +282,7 @@ graph LR
 </details>
 
 <details>
-<summary><h3>🌐 Modern Frontend (40+ Tissues)</h3></summary>
+<summary><h3>🌐 Modern Frontend (234 Snippets)</h3></summary>
 
 - **⚛️ React Ecosystem**
   - Next.js 14 App Router
@@ -301,7 +308,7 @@ graph LR
 </details>
 
 <details>
-<summary><h3>⚙️ Backend & APIs (35+ Tissues)</h3></summary>
+<summary><h3>⚙️ Backend & APIs (200+ Snippets)</h3></summary>
 
 - **🚀 Modern APIs**
   - FastAPI + Pydantic
@@ -327,7 +334,7 @@ graph LR
 </details>
 
 <details>
-<summary><h3>🔗 Web3 & Blockchain (25+ Tissues)</h3></summary>
+<summary><h3>🔗 Web3 & Blockchain (105 Snippets)</h3></summary>
 
 - **⛓️ Smart Contracts**
   - Solidity Templates
@@ -345,7 +352,7 @@ graph LR
 </details>
 
 <details>
-<summary><h3>🔧 DevOps & Tools (30+ Tissues)</h3></summary>
+<summary><h3>🔧 DevOps & Infrastructure (104 Snippets)</h3></summary>
 
 - **🐳 Containerization**
   - Docker Multi-stage Builds
@@ -367,106 +374,258 @@ graph LR
 
 </details>
 
+<details>
+<summary><h3>📊 Data Science & Analytics (721 Snippets)</h3></summary>
+
+- **🐼 Pandas**
+  - Data Loading (CSV, Excel, JSON, SQL)
+  - Data Cleaning & Transformation
+  - Aggregations & GroupBy
+  - Time Series Analysis
+  - Performance Optimization
+
+- **📐 NumPy**
+  - Array Operations
+  - Linear Algebra
+  - Statistical Functions
+  - Vectorization
+  - Matrix Operations
+
+- **📈 Visualization**
+  - Matplotlib & Seaborn
+  - Plotly Interactive Charts
+  - Statistical Plots
+  - 3D Visualizations
+  - Heatmaps
+
+- **🤖 Machine Learning**
+  - Scikit-learn Pipelines
+  - Feature Engineering
+  - Model Training & Evaluation
+  - Hyperparameter Tuning
+  - Clustering & Dimensionality Reduction
+
+</details>
+
+<details>
+<summary><h3>📱 Mobile Development (104 Snippets)</h3></summary>
+
+- **⚛️ React Native**
+  - Navigation (Stack, Tab, Drawer)
+  - Animations (Reanimated)
+  - State Management (Zustand, Redux)
+  - API Integration
+  - Camera & Media
+
+- **🎯 Flutter**
+  - Widgets & Layouts
+  - State Management (Riverpod, BLoC)
+  - Animations
+  - Firebase Integration
+  - Platform Channels
+
+- **📲 Native**
+  - SwiftUI & Kotlin Compose
+  - Networking & Database
+  - Biometric Auth
+  - Location Services
+  - App Lifecycle
+
+</details>
+
+<details>
+<summary><h3>🧪 Testing (102 Snippets)</h3></summary>
+
+- **✅ Unit Testing**
+  - Jest & Vitest
+  - Pytest
+  - React Testing Library
+  - Mocking & Spies
+
+- **🔗 Integration Testing**
+  - API Testing (Supertest)
+  - Database Testing
+  - Service Integration
+  - WebSocket Testing
+
+- **🎭 E2E Testing**
+  - Playwright
+  - Cypress
+  - Selenium WebDriver
+  - Visual Regression
+  - Cross-browser Testing
+
+</details>
+
+<details>
+<summary><h3>🔐 Security (107 Snippets)</h3></summary>
+
+- **🔑 Authentication**
+  - JWT & OAuth2
+  - Multi-factor Auth (2FA, TOTP)
+  - Session Management
+  - Password Hashing (bcrypt, argon2)
+  - API Key Management
+
+- **🔒 Encryption**
+  - AES & RSA Encryption
+  - Digital Signatures
+  - TLS/SSL Configuration
+  - Key Derivation
+  - Certificate Handling
+
+- **🛡️ Security Best Practices**
+  - Input Validation
+  - XSS & CSRF Prevention
+  - SQL Injection Prevention
+  - Rate Limiting
+  - Security Headers
+
+</details>
+
+<details>
+<summary><h3>💾 Database (388 Snippets)</h3></summary>
+
+- **🗄️ SQL**
+  - Complex Queries & Joins
+  - Window Functions & CTEs
+  - Indexes & Views
+  - Stored Procedures & Triggers
+  - Transactions & Optimization
+
+- **📊 NoSQL**
+  - MongoDB Queries & Aggregation
+  - Redis Patterns & Caching
+  - Elasticsearch Full-text Search
+  - DynamoDB & Cassandra
+  - Graph Databases (Neo4j)
+
+- **🔧 ORMs**
+  - Prisma & TypeORM
+  - Sequelize & SQLAlchemy
+  - Mongoose
+  - Query Builders
+  - Migrations & Seeding
+
+- **⚡ Optimization**
+  - Query Optimization
+  - Indexing Strategies
+  - Connection Pooling
+  - Caching Layers
+  - Performance Monitoring
+
+</details>
+
 ---
 
 ## 🚀 Quick Start
 
-### 📦 Installation
+### 📦 Browse & Copy
+
+1. **Browse** the `snippets/` directory
+2. **Find** the code you need
+3. **Copy** into your project
+4. **Customize** as needed
 
 ```bash
 # Clone the repository
-git clone https://github.com/username/CodeSnippetBank.git
+git clone https://github.com/umitkacar/CodeSnippetBank.git
 cd CodeSnippetBank
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Install optional dependencies for all features
-pip install -r requirements-full.txt
+# Browse snippets
+ls snippets/
+# ai-ml  backend  database  data-science  devops  frontend  mobile  security  testing  web3
 ```
 
-### 🎯 Basic Usage
+### 🎯 Usage Examples
 
-```python
-from api.tissue_discovery_api import TissueDiscoveryAPI
-
-# Initialize API
-api = TissueDiscoveryAPI()
-
-# 🔍 Search for tissues
-results = api.search("GPT-4 integration")
-
-# 🤖 Get AI recommendations
-context = {
-    'task_type': 'chatbot',
-    'device': 'cloud',
-    'framework': 'fastapi'
-}
-recommendations = api.recommend_tissues(context)
-
-# 📊 View tissue details
-tissue = api.get_tissue("AI-TISSUE-GPT4-001")
-print(f"Quality Score: {tissue.quality_score}")
-print(f"Performance: {tissue.benchmarks}")
-```
+Simply copy the snippet files you need into your project!
 
 ### ⚡ Quick Examples
 
 <details>
-<summary><b>🤖 Build a ChatGPT Clone in 5 Minutes</b></summary>
+<summary><b>🤖 AI/ML: GPT-4 Integration</b></summary>
 
 ```python
-from tissues.ai.llm import GPT4Wrapper
-from tissues.backend.fastapi import create_chat_endpoint
+# Copy from snippets/ai-ml/llm/gpt4_basic_integration.py
+from openai import OpenAI
 
-# Setup LLM
-llm = GPT4Wrapper(api_key="your-key")
-
-# Create API endpoint
-app = create_chat_endpoint(llm)
-
-# Run server
-app.run()  # That's it! 🎉
-```
-
-</details>
-
-<details>
-<summary><b>🎨 Generate Images with Stable Diffusion</b></summary>
-
-```python
-from tissues.ai.generative import StableDiffusionXL
-
-# Initialize model
-model = StableDiffusionXL(device="cuda")
-
-# Generate image
-image = model.generate(
-    prompt="A futuristic city at sunset",
-    negative_prompt="blurry, low quality",
-    steps=30
+client = OpenAI(api_key="your-key")
+response = client.chat.completions.create(
+    model="gpt-4-turbo-preview",
+    messages=[{"role": "user", "content": "Hello!"}]
 )
-
-image.save("output.png")
+print(response.choices[0].message.content)
 ```
 
 </details>
 
 <details>
-<summary><b>👁️ Real-time Object Detection</b></summary>
+<summary><b>🌐 Frontend: React Custom Hook</b></summary>
 
-```python
-from tissues.cv.detection import YOLOv9
-from tissues.cv.camera import WebcamStream
+```typescript
+// Copy from snippets/frontend/react/useDebounce.ts
+import { useState, useEffect } from 'react';
 
-# Initialize detector
-detector = YOLOv9()
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-# Process video stream
-stream = WebcamStream()
-for frame in stream:
-    results = detector.detect(frame)
-    stream.display(results)
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+```
+
+</details>
+
+<details>
+<summary><b>🔗 Web3: NFT Smart Contract</b></summary>
+
+```solidity
+// Copy from snippets/web3/smart-contracts/ERC721Basic.sol
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+contract MyNFT is ERC721 {
+    uint256 private _tokenIds;
+
+    constructor() ERC721("MyNFT", "MNFT") {}
+
+    function mint(address to) public returns (uint256) {
+        _tokenIds++;
+        _mint(to, _tokenIds);
+        return _tokenIds;
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><b>💾 Database: Prisma Schema</b></summary>
+
+```prisma
+// Copy from snippets/database/orm/01_prisma_schemas.ts
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  posts     Post[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+}
 ```
 
 </details>

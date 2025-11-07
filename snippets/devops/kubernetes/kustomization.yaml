@@ -1,0 +1,121 @@
+# Kustomization base
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Metadata
+namespace: production
+
+# Common labels applied to all resources
+commonLabels:
+  app: myapp
+  team: platform
+  managed-by: kustomize
+
+# Common annotations
+commonAnnotations:
+  version: "1.0.0"
+  last-applied: "2024-01-01"
+
+# Name prefix for all resources
+namePrefix: prod-
+
+# Name suffix
+# nameSuffix: -v1
+
+# Resources to include
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - configmap.yaml
+  - secret.yaml
+
+# ConfigMap generator
+configMapGenerator:
+  - name: app-config
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+    files:
+      - config.properties
+      - nginx.conf
+
+# Secret generator
+secretGenerator:
+  - name: app-secret
+    literals:
+      - API_KEY=secret-key
+      - DB_PASSWORD=secret-password
+    files:
+      - tls.crt
+      - tls.key
+    type: kubernetes.io/tls
+
+# Images to use
+images:
+  - name: myapp
+    newName: myregistry/myapp
+    newTag: 1.0.0
+  - name: nginx
+    newName: nginx
+    newTag: alpine
+
+# Replicas
+replicas:
+  - name: web-deployment
+    count: 3
+
+# Patches - Strategic Merge
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: web-deployment
+    spec:
+      template:
+        spec:
+          containers:
+          - name: web
+            resources:
+              limits:
+                memory: 512Mi
+                cpu: 500m
+
+# Patches - JSON 6902
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: web-deployment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 5
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: NEW_ENV
+          value: "new_value"
+
+# Variables
+vars:
+  - name: SERVICE_NAME
+    objref:
+      kind: Service
+      name: web-service
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.name
+
+# Generators
+generators: []
+
+# Transformers
+transformers: []
+
+# Build options
+buildMetadata:
+  - managedByLabel
+  - originAnnotations

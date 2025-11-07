@@ -1,0 +1,104 @@
+# One-time Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migration
+  namespace: production
+spec:
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: migration
+        image: myregistry/migration:1.0.0
+        command: ["./migrate"]
+        args: ["up"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: url
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+# Parallel Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-processing
+  namespace: production
+spec:
+  parallelism: 5  # Run 5 pods in parallel
+  completions: 10  # Total number of completions needed
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: processor
+        image: myregistry/processor:1.0.0
+        command: ["python", "process.py"]
+        env:
+        - name: JOB_COMPLETION_INDEX
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['batch.kubernetes.io/job-completion-index']
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+---
+# Job with Init Containers
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backup-job
+  namespace: production
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: check-db
+        image: postgres:16-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h postgres -p 5432; do
+            echo "Waiting for database..."
+            sleep 2
+          done
+      containers:
+      - name: backup
+        image: postgres:16-alpine
+        command:
+        - sh
+        - -c
+        - |
+          pg_dump -h postgres -U postgres mydb | gzip > /backup/backup-$(date +%Y%m%d-%H%M%S).sql.gz
+        volumeMounts:
+        - name: backup
+          mountPath: /backup
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+      volumes:
+      - name: backup
+        persistentVolumeClaim:
+          claimName: backup-pvc

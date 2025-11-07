@@ -1,0 +1,123 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_BUILDKIT: 1
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+stages:
+  - build
+  - test
+  - scan
+  - push
+  - deploy
+
+# Build multi-arch Docker image
+docker:build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker buildx create --use
+  script:
+    - docker buildx build
+      --platform linux/amd64,linux/arm64
+      --build-arg VERSION=$CI_COMMIT_SHORT_SHA
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $IMAGE_TAG
+      --tag $CI_REGISTRY_IMAGE:latest
+      --push
+      .
+  only:
+    - main
+    - develop
+
+# Test Docker image
+docker:test:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $IMAGE_TAG
+    - docker run --rm $IMAGE_TAG npm test
+  only:
+    - main
+    - develop
+
+# Security scan with Trivy
+security:trivy:
+  stage: scan
+  image: aquasec/trivy:latest
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - trivy image --severity HIGH,CRITICAL --exit-code 1 $IMAGE_TAG
+  allow_failure: true
+  only:
+    - main
+
+# Container scanning
+security:scan:
+  stage: scan
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE: $IMAGE_TAG
+    DOCKER_USER: $CI_REGISTRY_USER
+    DOCKER_PASSWORD: $CI_REGISTRY_PASSWORD
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_TAG
+    - apk add --no-cache curl
+    - |
+      docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $(pwd):/tmp \
+        aquasec/trivy image --format json --output /tmp/trivy-report.json $IMAGE_TAG
+  artifacts:
+    reports:
+      container_scanning: trivy-report.json
+    expire_in: 1 week
+  only:
+    - main
+
+# Push to additional registries
+docker:push:dockerhub:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD docker.io
+  script:
+    - docker pull $IMAGE_TAG
+    - docker tag $IMAGE_TAG $DOCKERHUB_REPO:$CI_COMMIT_SHORT_SHA
+    - docker tag $IMAGE_TAG $DOCKERHUB_REPO:latest
+    - docker push $DOCKERHUB_REPO:$CI_COMMIT_SHORT_SHA
+    - docker push $DOCKERHUB_REPO:latest
+  only:
+    - main
+  when: manual
+
+# Deploy to Kubernetes
+deploy:k8s:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl set image deployment/$CI_PROJECT_NAME
+      $CI_PROJECT_NAME=$IMAGE_TAG
+      -n production
+    - kubectl rollout status deployment/$CI_PROJECT_NAME -n production
+  environment:
+    name: production
+    url: https://example.com
+  only:
+    - main
+  when: manual

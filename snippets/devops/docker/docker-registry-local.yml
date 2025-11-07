@@ -1,0 +1,42 @@
+version: '3.8'
+
+# Local Docker registry with UI
+services:
+  registry:
+    image: registry:2
+    ports:
+      - "5000:5000"
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+    volumes:
+      - registry-data:/data
+      - ./registry/config.yml:/etc/docker/registry/config.yml:ro
+    networks:
+      - registry
+    restart: unless-stopped
+
+  registry-ui:
+    image: joxit/docker-registry-ui:latest
+    ports:
+      - "8080:80"
+    environment:
+      - REGISTRY_TITLE=Local Docker Registry
+      - REGISTRY_URL=http://registry:5000
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=http://registry:5000
+      - SINGLE_REGISTRY=true
+    depends_on:
+      - registry
+    networks:
+      - registry
+    restart: unless-stopped
+
+networks:
+  registry:
+    driver: bridge
+
+volumes:
+  registry-data:

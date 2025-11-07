@@ -1,0 +1,170 @@
+# Bitbucket Pipelines
+image: node:20
+
+definitions:
+  caches:
+    npm: ~/.npm
+    cypress: ~/.cache/Cypress
+
+  services:
+    postgres:
+      image: postgres:16
+      variables:
+        POSTGRES_DB: testdb
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+    redis:
+      image: redis:7-alpine
+
+  steps:
+    - step: &install
+        name: Install Dependencies
+        caches:
+          - npm
+        script:
+          - npm ci
+        artifacts:
+          - node_modules/**
+
+    - step: &lint
+        name: Lint
+        script:
+          - npm run lint
+
+    - step: &test-unit
+        name: Unit Tests
+        caches:
+          - npm
+        script:
+          - npm run test:unit -- --coverage
+        artifacts:
+          - coverage/**
+
+    - step: &test-integration
+        name: Integration Tests
+        services:
+          - postgres
+          - redis
+        script:
+          - npm run test:integration
+
+    - step: &build
+        name: Build
+        script:
+          - npm run build
+        artifacts:
+          - dist/**
+
+    - step: &docker-build
+        name: Build Docker Image
+        services:
+          - docker
+        script:
+          - export IMAGE_NAME=$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+          - docker build -t $IMAGE_NAME .
+          - docker tag $IMAGE_NAME $BITBUCKET_REPO_SLUG:latest
+          - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          - docker push $IMAGE_NAME
+          - docker push $BITBUCKET_REPO_SLUG:latest
+
+    - step: &security-scan
+        name: Security Scan
+        script:
+          - npm audit --audit-level=high
+          - |
+            if command -v trivy; then
+              trivy image $BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+            fi
+
+    - step: &deploy-staging
+        name: Deploy to Staging
+        deployment: staging
+        script:
+          - pipe: atlassian/kubectl-run:3.2.0
+            variables:
+              KUBE_CONFIG: $KUBE_CONFIG_STAGING
+              KUBECTL_COMMAND: 'set image deployment/myapp myapp=$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT -n staging'
+          - pipe: atlassian/kubectl-run:3.2.0
+            variables:
+              KUBE_CONFIG: $KUBE_CONFIG_STAGING
+              KUBECTL_COMMAND: 'rollout status deployment/myapp -n staging'
+
+    - step: &deploy-production
+        name: Deploy to Production
+        deployment: production
+        trigger: manual
+        script:
+          - pipe: atlassian/kubectl-run:3.2.0
+            variables:
+              KUBE_CONFIG: $KUBE_CONFIG_PRODUCTION
+              KUBECTL_COMMAND: 'set image deployment/myapp myapp=$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT -n production'
+          - pipe: atlassian/kubectl-run:3.2.0
+            variables:
+              KUBE_CONFIG: $KUBE_CONFIG_PRODUCTION
+              KUBECTL_COMMAND: 'rollout status deployment/myapp -n production'
+
+pipelines:
+  default:
+    - step: *install
+    - parallel:
+        - step: *lint
+        - step: *test-unit
+        - step: *test-integration
+    - step: *build
+
+  branches:
+    main:
+      - step: *install
+      - parallel:
+          - step: *lint
+          - step: *test-unit
+          - step: *test-integration
+      - step: *build
+      - step: *docker-build
+      - step: *security-scan
+      - step: *deploy-staging
+      - step: *deploy-production
+
+    develop:
+      - step: *install
+      - parallel:
+          - step: *lint
+          - step: *test-unit
+      - step: *build
+      - step: *docker-build
+      - step: *deploy-staging
+
+  pull-requests:
+    '**':
+      - step: *install
+      - parallel:
+          - step: *lint
+          - step: *test-unit
+      - step: *build
+
+  tags:
+    'v*':
+      - step: *install
+      - step: *build
+      - step: *docker-build
+      - step:
+          name: Create Release
+          script:
+            - pipe: atlassian/bitbucket-upload-file:0.3.2
+              variables:
+                BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+                BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+                FILENAME: 'dist/**'
+
+  custom:
+    sonar:
+      - step:
+          name: SonarQube Analysis
+          script:
+            - pipe: sonarsource/sonarcloud-scan:1.4.0
+              variables:
+                SONAR_TOKEN: $SONAR_TOKEN
+
+options:
+  max-time: 30
+  docker: true

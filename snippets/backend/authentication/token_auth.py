@@ -1,0 +1,2 @@
+# Token Authentication
+from itsdangerous import URLSafeTimedSerializer

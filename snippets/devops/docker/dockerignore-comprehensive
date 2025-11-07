@@ -1,0 +1,78 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+Jenkinsfile
+
+# Documentation
+*.md
+docs/
+README*
+LICENSE
+CHANGELOG*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependencies
+node_modules/
+bower_components/
+vendor/
+venv/
+env/
+.env.*
+
+# Build outputs
+dist/
+build/
+out/
+target/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+junit.xml
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.cache
+.cache/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Development
+*.development.*
+.env.local
+.env.development
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

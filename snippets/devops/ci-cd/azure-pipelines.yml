@@ -1,0 +1,130 @@
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+  tags:
+    include:
+    - v*
+
+pr:
+  branches:
+    include:
+    - main
+
+variables:
+  - name: nodeVersion
+    value: '20.x'
+  - name: dockerRegistry
+    value: 'myregistry.azurecr.io'
+  - name: imageName
+    value: 'myapp'
+
+stages:
+- stage: Build
+  displayName: 'Build and Test'
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(nodeVersion)
+      displayName: 'Install Node.js'
+
+    - task: Npm@1
+      displayName: 'npm install'
+      inputs:
+        command: 'ci'
+
+    - task: Npm@1
+      displayName: 'npm lint'
+      inputs:
+        command: 'custom'
+        customCommand: 'run lint'
+
+    - task: Npm@1
+      displayName: 'npm test'
+      inputs:
+        command: 'custom'
+        customCommand: 'test -- --coverage'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/junit.xml'
+        mergeTestResults: true
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish coverage'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+
+    - task: Npm@1
+      displayName: 'npm build'
+      inputs:
+        command: 'custom'
+        customCommand: 'run build'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        pathToPublish: 'dist'
+        artifactName: 'drop'
+
+- stage: Docker
+  displayName: 'Build Docker Image'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: Docker
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: 'Build image'
+      inputs:
+        command: 'build'
+        repository: '$(imageName)'
+        dockerfile: 'Dockerfile'
+        tags: |
+          $(Build.BuildId)
+          latest
+
+    - task: Docker@2
+      displayName: 'Push image'
+      inputs:
+        command: 'push'
+        containerRegistry: 'dockerRegistryServiceConnection'
+        repository: '$(imageName)'
+        tags: |
+          $(Build.BuildId)
+          latest
+
+- stage: Deploy
+  displayName: 'Deploy to Kubernetes'
+  dependsOn: Docker
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to Production'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: 'Deploy to Kubernetes'
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'k8sServiceConnection'
+              namespace: 'production'
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              containers: '$(dockerRegistry)/$(imageName):$(Build.BuildId)'

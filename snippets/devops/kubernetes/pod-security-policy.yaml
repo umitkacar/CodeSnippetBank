@@ -1,0 +1,86 @@
+# Restricted Pod Security Standard
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: restricted-namespace
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Baseline Pod Security Standard
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: baseline-namespace
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+---
+# Security Context for pods
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+  namespace: production
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    fsGroupChangePolicy: "OnRootMismatch"
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: myapp:1.0.0
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: cache
+      mountPath: /app/cache
+  volumes:
+  - name: tmp
+    emptyDir: {}
+  - name: cache
+    emptyDir: {}
+---
+# App Armor profile
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apparmor-pod
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/app: runtime/default
+spec:
+  containers:
+  - name: app
+    image: nginx:alpine
+---
+# SELinux options
+apiVersion: v1
+kind: Pod
+metadata:
+  name: selinux-pod
+spec:
+  securityContext:
+    seLinuxOptions:
+      level: "s0:c123,c456"
+  containers:
+  - name: app
+    image: nginx:alpine
+    securityContext:
+      seLinuxOptions:
+        level: "s0:c123,c456"

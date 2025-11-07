@@ -1,0 +1,85 @@
+language: node_js
+node_js:
+  - 18
+  - 20
+
+services:
+  - docker
+  - postgresql
+  - redis-server
+
+env:
+  global:
+    - NODE_ENV=test
+    - DATABASE_URL=postgresql://postgres@localhost/testdb
+    - REDIS_URL=redis://localhost:6379
+    - DOCKER_COMPOSE_VERSION=2.23.0
+
+before_install:
+  # Update Docker Compose
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+install:
+  - npm ci
+
+before_script:
+  - psql -c 'create database testdb;' -U postgres
+
+script:
+  - npm run lint
+  - npm test -- --coverage
+  - npm run build
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+cache:
+  directories:
+    - node_modules
+
+branches:
+  only:
+    - main
+    - develop
+
+jobs:
+  include:
+    - stage: test
+      name: "Unit Tests"
+      script: npm run test:unit
+
+    - stage: test
+      name: "Integration Tests"
+      script: npm run test:integration
+
+    - stage: docker
+      if: branch = main
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t myorg/myapp:$TRAVIS_COMMIT .
+        - docker tag myorg/myapp:$TRAVIS_COMMIT myorg/myapp:latest
+        - docker push myorg/myapp:$TRAVIS_COMMIT
+        - docker push myorg/myapp:latest
+
+    - stage: deploy
+      if: branch = main AND type = push
+      script:
+        - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+        - export KUBECONFIG=./kubeconfig
+        - kubectl set image deployment/myapp myapp=myorg/myapp:$TRAVIS_COMMIT -n production
+        - kubectl rollout status deployment/myapp -n production
+
+notifications:
+  email:
+    recipients:
+      - devops@example.com
+    on_success: change
+    on_failure: always
+  slack:
+    rooms:
+      - secure: "encrypted-token"
+    on_success: change
+    on_failure: always

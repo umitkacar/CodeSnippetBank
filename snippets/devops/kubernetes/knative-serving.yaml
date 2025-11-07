@@ -1,0 +1,68 @@
+# Knative Service
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-world
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/target: "10"
+    spec:
+      containerConcurrency: 100
+      timeoutSeconds: 300
+      containers:
+      - image: gcr.io/knative-samples/helloworld-go
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TARGET
+          value: "World"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+---
+# Knative Service with traffic split
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: production
+spec:
+  template:
+    metadata:
+      name: api-service-v2
+    spec:
+      containers:
+      - image: myregistry/api:v2
+        ports:
+        - containerPort: 8080
+  traffic:
+  - revisionName: api-service-v1
+    percent: 90
+    tag: stable
+  - revisionName: api-service-v2
+    percent: 10
+    tag: canary
+  - latestRevision: true
+    percent: 0
+    tag: latest
+---
+# DomainMapping for custom domain
+apiVersion: serving.knative.dev/v1beta1
+kind: DomainMapping
+metadata:
+  name: api.example.com
+  namespace: production
+spec:
+  ref:
+    name: api-service
+    kind: Service
+    apiVersion: serving.knative.dev/v1
