@@ -1,0 +1,158 @@
+image: node:20-alpine
+
+stages:
+  - install
+  - lint
+  - test
+  - build
+  - docker
+  - deploy
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+    - .npm/
+
+# Install dependencies
+install:
+  stage: install
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 day
+
+# Linting
+lint:
+  stage: lint
+  needs: [install]
+  script:
+    - npm run lint
+  allow_failure: false
+
+# Type checking
+typecheck:
+  stage: lint
+  needs: [install]
+  script:
+    - npm run typecheck
+  allow_failure: false
+
+# Unit tests
+test:unit:
+  stage: test
+  needs: [install]
+  coverage: '/Statements\s*:\s*(\d+\.\d+)%/'
+  script:
+    - npm run test:unit -- --coverage
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+      junit: junit.xml
+    paths:
+      - coverage/
+    expire_in: 30 days
+
+# Integration tests
+test:integration:
+  stage: test
+  needs: [install]
+  services:
+    - postgres:16-alpine
+    - redis:7-alpine
+  variables:
+    POSTGRES_DB: testdb
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    DATABASE_URL: postgresql://postgres:postgres@postgres:5432/testdb
+    REDIS_URL: redis://redis:6379
+  script:
+    - npm run test:integration
+  artifacts:
+    reports:
+      junit: junit-integration.xml
+
+# Build application
+build:
+  stage: build
+  needs: [lint, typecheck, test:unit]
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags
+
+# Build Docker image
+docker:build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  needs: [build]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build
+      --build-arg VERSION=$CI_COMMIT_SHORT_SHA
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE:latest
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+
+# Deploy to staging
+deploy:staging:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  needs: [docker:build]
+  environment:
+    name: staging
+    url: https://staging.example.com
+  before_script:
+    - kubectl config use-context staging
+  script:
+    - kubectl set image deployment/app
+      app=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      -n staging
+    - kubectl rollout status deployment/app -n staging
+  only:
+    - develop
+
+# Deploy to production
+deploy:production:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  needs: [docker:build]
+  environment:
+    name: production
+    url: https://example.com
+  before_script:
+    - kubectl config use-context production
+  script:
+    - kubectl set image deployment/app
+      app=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      -n production
+    - kubectl rollout status deployment/app -n production
+  only:
+    - main
+  when: manual

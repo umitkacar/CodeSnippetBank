@@ -1,0 +1,42 @@
+[Unit]
+Description=Prometheus Node Exporter
+Documentation=https://github.com/prometheus/node_exporter
+After=network-online.target
+
+[Service]
+Type=simple
+User=node_exporter
+Group=node_exporter
+ExecStart=/usr/local/bin/node_exporter \
+  --collector.disable-defaults \
+  --collector.cpu \
+  --collector.diskstats \
+  --collector.filesystem \
+  --collector.loadavg \
+  --collector.meminfo \
+  --collector.netdev \
+  --collector.stat \
+  --collector.time \
+  --collector.uname \
+  --collector.vmstat \
+  --collector.systemd \
+  --collector.processes \
+  --collector.textfile.directory=/var/lib/node_exporter/textfile_collector \
+  --web.listen-address=:9100 \
+  --web.telemetry-path=/metrics
+
+SyslogIdentifier=node_exporter
+Restart=always
+RestartSec=5
+
+# Security settings
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ReadWritePaths=/var/lib/node_exporter
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,149 @@
+# Drone CI pipeline
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: install
+    image: node:20-alpine
+    commands:
+      - npm ci
+
+  - name: lint
+    image: node:20-alpine
+    commands:
+      - npm run lint
+    depends_on:
+      - install
+
+  - name: test
+    image: node:20-alpine
+    commands:
+      - npm test -- --coverage
+    depends_on:
+      - install
+
+  - name: build
+    image: node:20-alpine
+    commands:
+      - npm run build
+    depends_on:
+      - lint
+      - test
+
+  - name: docker-build
+    image: plugins/docker
+    settings:
+      registry: registry.example.com
+      repo: registry.example.com/myapp
+      tags:
+        - ${DRONE_COMMIT_SHA:0:7}
+        - latest
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      build_args:
+        - VERSION=${DRONE_COMMIT_SHA:0:7}
+    depends_on:
+      - build
+    when:
+      branch:
+        - main
+
+  - name: security-scan
+    image: aquasec/trivy
+    commands:
+      - trivy image registry.example.com/myapp:${DRONE_COMMIT_SHA:0:7}
+    depends_on:
+      - docker-build
+    when:
+      branch:
+        - main
+
+  - name: deploy-staging
+    image: bitnami/kubectl
+    environment:
+      KUBECONFIG:
+        from_secret: kubeconfig_staging
+    commands:
+      - kubectl set image deployment/myapp myapp=registry.example.com/myapp:${DRONE_COMMIT_SHA:0:7} -n staging
+      - kubectl rollout status deployment/myapp -n staging
+    depends_on:
+      - security-scan
+    when:
+      branch:
+        - develop
+
+  - name: deploy-production
+    image: bitnami/kubectl
+    environment:
+      KUBECONFIG:
+        from_secret: kubeconfig_production
+    commands:
+      - kubectl set image deployment/myapp myapp=registry.example.com/myapp:${DRONE_COMMIT_SHA:0:7} -n production
+      - kubectl rollout status deployment/myapp -n production
+    depends_on:
+      - security-scan
+    when:
+      branch:
+        - main
+      event:
+        - promote
+
+  - name: slack-notification
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      channel: deployments
+      template: |
+        {{#success build.status}}
+        ✅ Build {{build.number}} succeeded
+        {{else}}
+        ❌ Build {{build.number}} failed
+        {{/success}}
+        Branch: {{build.branch}}
+        Commit: {{build.commit}}
+    when:
+      status:
+        - success
+        - failure
+
+services:
+  - name: postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+
+  - name: redis
+    image: redis:7-alpine
+
+trigger:
+  branch:
+    - main
+    - develop
+  event:
+    - push
+    - pull_request
+    - promote
+
+---
+# Cron pipeline for nightly builds
+kind: pipeline
+type: docker
+name: nightly
+
+steps:
+  - name: test
+    image: node:20-alpine
+    commands:
+      - npm ci
+      - npm test
+
+trigger:
+  event:
+    - cron
+  cron:
+    - nightly

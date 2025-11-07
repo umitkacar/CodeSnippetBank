@@ -1,0 +1,85 @@
+# Velero Backup schedule
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-backup
+  namespace: velero
+spec:
+  schedule: "0 2 * * *"  # Every day at 2 AM
+  template:
+    includedNamespaces:
+    - production
+    - staging
+    excludedNamespaces:
+    - kube-system
+    - kube-public
+    includedResources:
+    - '*'
+    excludedResources:
+    - events
+    - events.events.k8s.io
+    labelSelector:
+      matchLabels:
+        backup: "true"
+    snapshotVolumes: true
+    ttl: 720h  # 30 days
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+---
+# Velero Backup (one-time)
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: production-backup
+  namespace: velero
+spec:
+  includedNamespaces:
+  - production
+  excludedResources:
+  - events
+  snapshotVolumes: true
+  storageLocation: default
+  ttl: 168h  # 7 days
+---
+# Velero Restore
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: production-restore
+  namespace: velero
+spec:
+  backupName: daily-backup-20240101120000
+  includedNamespaces:
+  - production
+  excludedResources:
+  - nodes
+  - events
+  restorePVs: true
+  preserveNodePorts: false
+---
+# BackupStorageLocation (AWS S3)
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  namespace: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: velero-backups
+    prefix: production
+  config:
+    region: us-east-1
+    s3ForcePathStyle: "false"
+---
+# VolumeSnapshotLocation (AWS EBS)
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: default
+  namespace: velero
+spec:
+  provider: aws
+  config:
+    region: us-east-1

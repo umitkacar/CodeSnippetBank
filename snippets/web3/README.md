@@ -1,437 +1,209 @@
-# 🔗 Web3 & Blockchain Snippets
+# Web3 Code Snippets Collection
 
-<div align="center">
+Production-ready Web3 code snippets organized in three main categories.
 
-![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white)
-![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
-![Web3.js](https://img.shields.io/badge/Web3.js-F16822?style=for-the-badge&logo=web3.js&logoColor=white)
-![IPFS](https://img.shields.io/badge/IPFS-65C2CB?style=for-the-badge&logo=ipfs&logoColor=white)
+## 📊 Summary
 
-</div>
+- **Total Files**: 105 production-ready snippets
+- **Smart Contracts**: 42 Solidity files (.sol)
+- **DApp Integration**: 31 TypeScript files (.ts/.tsx)
+- **DeFi Protocols**: 31 TypeScript files (.ts)
 
-## ⛓️ Smart Contracts
+## 🔐 Smart Contracts (42 files)
 
-### ERC-20 Token (Solidity)
+### ERC Standards
+- ERC20Token.sol - Basic ERC20 implementation
+- ERC20WithBurn.sol - Deflationary token with auto-burn
+- ERC20Snapshot.sol - Snapshot capability for voting
+- ERC20Permit.sol - Gasless approvals (EIP-2612)
+- ERC20Capped.sol - Supply-capped token
+- ERC721Basic.sol - NFT collection with minting
+- ERC721Enumerable.sol - NFT with enumeration
+- ERC721URIStorage.sol - Individual token URIs
+- ERC721Royalty.sol - EIP-2981 royalty standard
+- ERC721Merkle.sol - Merkle tree whitelist
+- ERC1155Basic.sol - Multi-token standard
+- ERC1155Burnable.sol - Multi-token with burn
+- ERC1155Supply.sol - Supply tracking
+- ERC1155URIStorage.sol - Per-token URIs
 
+### Staking & Vesting
+- StakingRewards.sol - ERC20 staking with rewards
+- NFTStaking.sol - Stake NFTs for rewards
+- LiquidityStaking.sol - LP staking with bonuses
+- TokenVesting.sol - Token vesting with cliff
+- VestingSchedule.sol - Milestone-based vesting
+- TeamVesting.sol - 4-year team vesting
+
+### Multisig & Governance
+- MultiSigWallet.sol - Production multisig
+- GnosisMultiSig.sol - Gnosis-style multisig
+- TimeLockedMultiSig.sol - Multisig with timelock
+- DAOGovernor.sol - OpenZeppelin Governor
+- DAOTimelock.sol - Timelock controller
+- DAOToken.sol - Governance token
+
+### DeFi Protocols
+- SimpleAMM.sol - Constant product AMM
+- LendingProtocol.sol - Lending/borrowing
+- YieldVault.sol - Yield aggregator
+- LiquidityPool.sol - Two-token pool
+- FlashLoan.sol - Flash loan provider
+
+### Upgradeable Patterns
+- TransparentProxy.sol - Transparent proxy
+- UUPSProxy.sol - UUPS upgradeable
+- BeaconProxy.sol - Beacon proxy factory
+- ProxyAdmin.sol - Proxy admin contract
+
+### Access Control & Security
+- AccessControl.sol - Role-based access
+- Ownable2Step.sol - Two-step ownership
+- RoleBasedAccess.sol - Advanced RBAC
+- Pausable.sol - Emergency pause
+- ReentrancyGuard.sol - Reentrancy protection
+
+### Oracles & Pricing
+- PriceOracle.sol - Price feed with TWAP
+- ChainlinkOracle.sol - Chainlink integration
+
+## ⚡ DApp Integration (31 files)
+
+### Core Setup
+- ethers-setup.ts - Ethers.js v6 configuration
+- wagmi-config.ts - Wagmi v2 setup
+- wallet-connect.ts - Wallet connection hooks
+- web3modal-setup.ts - Web3Modal v4 integration
+
+### Contract Interaction
+- contract-read.ts - Read contract data
+- contract-write.ts - Execute transactions
+- contract-factory.ts - Deploy contracts
+- transaction-status.ts - Track transaction status
+- event-listeners.ts - Listen to events
+- multicall.ts - Batch contract calls
+- batch-transactions.ts - Sequential transactions
+
+### Token Operations
+- token-approvals.ts - ERC20 approvals
+- token-balance.ts - Balance tracking
+- permit-signatures.ts - EIP-2612 permit
+- wallet-balance-tracker.ts - Real-time balances
+
+### Network & Chain
+- network-switcher.ts - Multi-chain switching
+- block-explorer.ts - Explorer integration
+- ens-resolution.ts - ENS name resolution
+
+### Advanced Features
+- signature-verification.ts - EIP-191/712 signing
+- gas-optimization.ts - Gas estimation & optimization
+- nft-metadata.ts - NFT metadata fetching
+- ipfs-upload.ts - IPFS file upload
+- price-feeds.ts - Token price feeds
+- error-handling.ts - Web3 error parsing
+- local-storage.ts - Wallet preferences
+- wallet-provider.tsx - React context
+- wallet-modal.tsx - Connection modal
+- contract-verification.ts - Etherscan verification
+- transaction-builder.ts - Transaction encoding
+- contract-events-history.ts - Historical events
+- abi-utils.ts - ABI parsing utilities
+
+## 💰 DeFi Protocols (31 files)
+
+### Decentralized Exchanges
+- uniswap-v3-swap.ts - Uniswap V3 integration
+- uniswap-v2-swap.ts - Uniswap V2 swaps
+- uniswap-liquidity.ts - Liquidity management
+- curve-finance.ts - Curve stablecoin swaps
+- balancer-pools.ts - Balancer weighted pools
+- token-swap-aggregator.ts - 1inch integration
+
+### Lending Protocols
+- aave-lending.ts - Aave V3 supply/borrow
+- compound-lending.ts - Compound V3 integration
+- lending-aggregator.ts - Compare rates
+
+### Yield & Staking
+- yield-farming.ts - MasterChef farming
+- staking-pools.ts - Single-asset staking
+- yield-aggregator.ts - Auto-compounding vaults
+- liquidity-mining.ts - LP mining rewards
+- auto-compounder.ts - Auto-harvest strategies
+
+### Advanced DeFi
+- flash-loans.ts - Flash loan execution
+- price-oracles.ts - Chainlink & TWAP
+- governance-voting.ts - DAO voting
+- perpetual-protocols.ts - Leveraged trading
+- options-trading.ts - DeFi options
+- synthetic-assets.ts - Synthetix integration
+- insurance-protocols.ts - Smart contract insurance
+- cross-chain-bridge.ts - Cross-chain transfers
+
+### Portfolio & Risk
+- portfolio-tracker.ts - Multi-protocol tracking
+- liquidation-bot.ts - Monitor liquidations
+- arbitrage-bot.ts - Find arbitrage
+- impermanent-loss.ts - IL calculator
+- slippage-protection.ts - Slippage management
+- gas-optimizer.ts - DeFi gas optimization
+- rebalancing-strategy.ts - Portfolio rebalancing
+- risk-metrics.ts - Risk assessment
+- tvl-calculator.ts - TVL calculations
+
+## 🚀 Usage
+
+All snippets are production-ready and can be used directly in your projects.
+
+### Smart Contracts
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-
-contract ModernToken is ERC20, Ownable, Pausable {
-    uint256 public constant MAX_SUPPLY = 1000000 * 10**18; // 1 million tokens
-    mapping(address => bool) public blacklisted;
-
-    event Blacklisted(address indexed account);
-    event Whitelisted(address indexed account);
-
-    constructor(
-        string memory name,
-        string memory symbol,
-        uint256 initialSupply
-    ) ERC20(name, symbol) {
-        require(initialSupply <= MAX_SUPPLY, "Exceeds max supply");
-        _mint(msg.sender, initialSupply);
-    }
-
-    function mint(address to, uint256 amount) public onlyOwner {
-        require(totalSupply() + amount <= MAX_SUPPLY, "Exceeds max supply");
-        _mint(to, amount);
-    }
-
-    function burn(uint256 amount) public {
-        _burn(msg.sender, amount);
-    }
-
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-
-    function blacklist(address account) public onlyOwner {
-        blacklisted[account] = true;
-        emit Blacklisted(account);
-    }
-
-    function whitelist(address account) public onlyOwner {
-        blacklisted[account] = false;
-        emit Whitelisted(account);
-    }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override whenNotPaused {
-        require(!blacklisted[from], "Sender is blacklisted");
-        require(!blacklisted[to], "Recipient is blacklisted");
-        super._beforeTokenTransfer(from, to, amount);
-    }
-}
+// Import and extend
+import "./ERC20Token.sol";
 ```
 
-### NFT Collection with Royalties
-
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-
-contract ModernNFT is ERC721URIStorage, ERC2981, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-
-    uint256 public constant MAX_SUPPLY = 10000;
-    uint256 public constant MINT_PRICE = 0.05 ether;
-    uint256 public constant MAX_PER_WALLET = 5;
-
-    mapping(address => uint256) public mintCount;
-    string public baseTokenURI;
-
-    event NFTMinted(address indexed to, uint256 tokenId);
-
-    constructor(
-        string memory name,
-        string memory symbol,
-        string memory _baseTokenURI,
-        address royaltyReceiver,
-        uint96 royaltyFeeNumerator
-    ) ERC721(name, symbol) {
-        baseTokenURI = _baseTokenURI;
-        _setDefaultRoyalty(royaltyReceiver, royaltyFeeNumerator); // e.g., 500 = 5%
-    }
-
-    function mint(uint256 quantity) public payable {
-        require(quantity > 0, "Quantity must be positive");
-        require(_tokenIds.current() + quantity <= MAX_SUPPLY, "Max supply reached");
-        require(mintCount[msg.sender] + quantity <= MAX_PER_WALLET, "Max per wallet exceeded");
-        require(msg.value >= MINT_PRICE * quantity, "Insufficient payment");
-
-        for (uint256 i = 0; i < quantity; i++) {
-            _tokenIds.increment();
-            uint256 newTokenId = _tokenIds.current();
-
-            _safeMint(msg.sender, newTokenId);
-            _setTokenURI(newTokenId, string(abi.encodePacked(baseTokenURI, Strings.toString(newTokenId), ".json")));
-
-            mintCount[msg.sender]++;
-            emit NFTMinted(msg.sender, newTokenId);
-        }
-    }
-
-    function withdraw() public onlyOwner {
-        uint256 balance = address(this).balance;
-        payable(owner()).transfer(balance);
-    }
-
-    function setBaseURI(string memory _baseTokenURI) public onlyOwner {
-        baseTokenURI = _baseTokenURI;
-    }
-
-    function setRoyaltyInfo(address receiver, uint96 feeNumerator) public onlyOwner {
-        _setDefaultRoyalty(receiver, feeNumerator);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721URIStorage, ERC2981)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
-    }
-}
-```
-
-## 🌐 Web3 Integration
-
-### ethers.js v6 (Latest)
-
+### DApp Integration
 ```typescript
-// lib/web3.ts
-import { ethers } from 'ethers'
-
-export class Web3Provider {
-  private provider: ethers.BrowserProvider | null = null
-  private signer: ethers.JsonRpcSigner | null = null
-
-  async connect() {
-    if (!window.ethereum) {
-      throw new Error('No wallet detected')
-    }
-
-    this.provider = new ethers.BrowserProvider(window.ethereum)
-
-    // Request account access
-    await this.provider.send('eth_requestAccounts', [])
-
-    this.signer = await this.provider.getSigner()
-
-    return {
-      address: await this.signer.getAddress(),
-      chainId: (await this.provider.getNetwork()).chainId,
-    }
-  }
-
-  async getBalance(address: string) {
-    if (!this.provider) throw new Error('Not connected')
-
-    const balance = await this.provider.getBalance(address)
-    return ethers.formatEther(balance)
-  }
-
-  async sendTransaction(to: string, amount: string) {
-    if (!this.signer) throw new Error('Not connected')
-
-    const tx = await this.signer.sendTransaction({
-      to,
-      value: ethers.parseEther(amount),
-    })
-
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  async signMessage(message: string) {
-    if (!this.signer) throw new Error('Not connected')
-    return await this.signer.signMessage(message)
-  }
-}
-
-// Contract interaction
-export class ContractHandler {
-  private contract: ethers.Contract
-
-  constructor(
-    address: string,
-    abi: any[],
-    signerOrProvider: ethers.Signer | ethers.Provider
-  ) {
-    this.contract = new ethers.Contract(address, abi, signerOrProvider)
-  }
-
-  // Read function
-  async read(functionName: string, ...args: any[]) {
-    return await this.contract[functionName](...args)
-  }
-
-  // Write function
-  async write(functionName: string, ...args: any[]) {
-    const tx = await this.contract[functionName](...args)
-    return await tx.wait()
-  }
-
-  // Listen to events
-  onEvent(eventName: string, callback: (...args: any[]) => void) {
-    this.contract.on(eventName, callback)
-  }
-}
-
-// Usage example
-const web3 = new Web3Provider()
-await web3.connect()
-
-const nftContract = new ContractHandler(
-  '0x...',
-  NFT_ABI,
-  await web3.getSigner()
-)
-
-// Mint NFT
-const receipt = await nftContract.write('mint', 1, {
-  value: ethers.parseEther('0.05'),
-})
-
-// Listen to mint events
-nftContract.onEvent('NFTMinted', (to, tokenId) => {
-  console.log(`Minted token ${tokenId} to ${to}`)
-})
+import { useWalletConnection } from './wallet-connect';
+import { useTokenBalance } from './token-balance';
 ```
 
-### wagmi + viem (Modern React Hooks)
-
+### DeFi Integration
 ```typescript
-// app/providers.tsx
-'use client'
-
-import { WagmiProvider, createConfig, http } from 'wagmi'
-import { mainnet, polygon, optimism } from 'wagmi/chains'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit'
-
-const config = createConfig(
-  getDefaultConfig({
-    appName: 'My Modern dApp',
-    walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-    chains: [mainnet, polygon, optimism],
-    transports: {
-      [mainnet.id]: http(),
-      [polygon.id]: http(),
-      [optimism.id]: http(),
-    },
-  })
-)
-
-const queryClient = new QueryClient()
-
-export function Web3Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider>{children}</ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  )
-}
-
-// components/MintNFT.tsx
-'use client'
-
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { parseEther } from 'viem'
-import { NFT_ABI, NFT_ADDRESS } from '@/lib/contracts'
-
-export function MintNFT() {
-  const { address, isConnected } = useAccount()
-  const { writeContract, data: hash } = useWriteContract()
-
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  const handleMint = async () => {
-    writeContract({
-      address: NFT_ADDRESS,
-      abi: NFT_ABI,
-      functionName: 'mint',
-      args: [1],
-      value: parseEther('0.05'),
-    })
-  }
-
-  if (!isConnected) return <div>Please connect your wallet</div>
-
-  return (
-    <div>
-      <button
-        onClick={handleMint}
-        disabled={isLoading}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        {isLoading ? 'Minting...' : 'Mint NFT'}
-      </button>
-
-      {isSuccess && <div>NFT Minted Successfully!</div>}
-    </div>
-  )
-}
+import { useUniswapV3Swap } from './uniswap-v3-swap';
+import { useAaveSupply } from './aave-lending';
 ```
 
-### IPFS Integration
+## 📦 Dependencies
 
-```typescript
-// lib/ipfs.ts
-import { create } from 'ipfs-http-client'
-import { NFTStorage, File } from 'nft.storage'
+### Smart Contracts
+- @openzeppelin/contracts ^5.0.0
+- @chainlink/contracts ^0.8.0
 
-// Using IPFS HTTP Client
-export class IPFSUploader {
-  private client: any
+### TypeScript
+- ethers ^6.0.0
+- wagmi ^2.0.0
+- viem ^2.0.0
+- @web3modal/wagmi ^4.0.0
 
-  constructor() {
-    this.client = create({
-      host: 'ipfs.infura.io',
-      port: 5001,
-      protocol: 'https',
-      headers: {
-        authorization: `Basic ${Buffer.from(
-          `${process.env.INFURA_PROJECT_ID}:${process.env.INFURA_SECRET}`
-        ).toString('base64')}`,
-      },
-    })
-  }
+## 🔒 Security Notes
 
-  async uploadFile(file: File) {
-    const added = await this.client.add(file)
-    return `ipfs://${added.path}`
-  }
+- All contracts use OpenZeppelin security patterns
+- Includes reentrancy guards where needed
+- Access control on sensitive functions
+- Tested patterns from production protocols
 
-  async uploadJSON(data: any) {
-    const json = JSON.stringify(data)
-    const added = await this.client.add(json)
-    return `ipfs://${added.path}`
-  }
-}
+## 📝 License
 
-// Using NFT.Storage (Recommended for NFTs)
-export class NFTStorageUploader {
-  private client: NFTStorage
+MIT License - Free to use in your projects
 
-  constructor() {
-    this.client = new NFTStorage({
-      token: process.env.NFT_STORAGE_KEY!,
-    })
-  }
+## 🤝 Contributing
 
-  async uploadNFT(
-    imageFile: File,
-    metadata: {
-      name: string
-      description: string
-      attributes?: Array<{ trait_type: string; value: string | number }>
-    }
-  ) {
-    const nft = await this.client.store({
-      image: imageFile,
-      name: metadata.name,
-      description: metadata.description,
-      attributes: metadata.attributes || [],
-    })
-
-    return {
-      url: nft.url,
-      ipnft: nft.ipnft,
-      data: nft.data,
-    }
-  }
-}
-
-// Usage
-const uploader = new NFTStorageUploader()
-const result = await uploader.uploadNFT(imageFile, {
-  name: 'Cool NFT #1',
-  description: 'An awesome NFT',
-  attributes: [
-    { trait_type: 'Background', value: 'Blue' },
-    { trait_type: 'Rarity', value: 'Legendary' },
-  ],
-})
-
-console.log(`NFT metadata: ${result.url}`)
-```
-
-## 📚 Popular Repositories
-
-- **[Hardhat](https://github.com/NomicFoundation/hardhat)** ⭐ 7k+ - Ethereum development environment
-- **[wagmi](https://github.com/wevm/wagmi)** ⭐ 5k+ - React Hooks for Ethereum
-- **[viem](https://github.com/wevm/viem)** ⭐ 2k+ - TypeScript interface for Ethereum
-- **[OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)** ⭐ 24k+ - Secure smart contracts
-- **[ethers.js](https://github.com/ethers-io/ethers.js)** ⭐ 7.5k+ - Ethereum library
+These snippets are production-ready examples. Customize for your needs.
 
 ---
 
-<div align="center">
-
-**[⬅️ Back: Backend](../backend/README.md)** | **[Next: DevOps →](../devops/README.md)**
-
-</div>
+**Created**: 2025-11-07
+**Language**: Solidity 0.8.20+ & TypeScript
+**Framework**: Hardhat/Foundry compatible

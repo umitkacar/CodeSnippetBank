@@ -1,0 +1,144 @@
+# Filebeat configuration
+filebeat.inputs:
+  # System logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/*.log
+      - /var/log/syslog
+    fields:
+      type: syslog
+    fields_under_root: true
+
+  # Application logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/app/*.log
+    json.keys_under_root: true
+    json.add_error_key: true
+    fields:
+      type: application
+    fields_under_root: true
+    multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+    multiline.negate: true
+    multiline.match: after
+
+  # Docker containers
+  - type: container
+    enabled: true
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+
+  # Kubernetes pods
+  - type: container
+    enabled: true
+    paths:
+      - /var/log/containers/*.log
+    processors:
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+
+  # Nginx access logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/access.log
+    fields:
+      type: nginx-access
+    fields_under_root: true
+
+  # Nginx error logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/error.log
+    fields:
+      type: nginx-error
+    fields_under_root: true
+    multiline.pattern: '^\d{4}/\d{2}/\d{2}'
+    multiline.negate: true
+    multiline.match: after
+
+# Filebeat modules
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+# Processors
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.id", "ecs.version"]
+      ignore_missing: true
+
+# Output to Elasticsearch
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  protocol: "http"
+  username: "elastic"
+  password: "changeme"
+  indices:
+    - index: "filebeat-syslog-%{+yyyy.MM.dd}"
+      when.equals:
+        fields.type: "syslog"
+    - index: "filebeat-app-%{+yyyy.MM.dd}"
+      when.equals:
+        fields.type: "application"
+    - index: "filebeat-nginx-%{+yyyy.MM.dd}"
+      when.or:
+        - equals:
+            fields.type: "nginx-access"
+        - equals:
+            fields.type: "nginx-error"
+
+# Output to Logstash (alternative)
+# output.logstash:
+#   hosts: ["logstash:5044"]
+#   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+#   ssl.certificate: "/etc/pki/client/cert.pem"
+#   ssl.key: "/etc/pki/client/cert.key"
+
+# Kibana integration
+setup.kibana:
+  host: "kibana:5601"
+  username: "elastic"
+  password: "changeme"
+
+# Template settings
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 0
+  index.codec: best_compression
+
+# ILM settings
+setup.ilm.enabled: true
+setup.ilm.rollover_alias: "filebeat"
+setup.ilm.pattern: "{now/d}-000001"
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Monitoring
+monitoring.enabled: true
+monitoring.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: "elastic"
+  password: "changeme"

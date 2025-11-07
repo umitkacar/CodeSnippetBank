@@ -1,0 +1,174 @@
+# Daily database backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: database-backup
+  namespace: production
+spec:
+  schedule: "0 2 * * *"  # Every day at 2 AM
+  timeZone: "America/New_York"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid  # Don't allow concurrent runs
+  startingDeadlineSeconds: 300
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400  # Clean up after 24 hours
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: postgres:16-alpine
+            command:
+            - sh
+            - -c
+            - |
+              BACKUP_FILE="backup-$(date +%Y%m%d-%H%M%S).sql.gz"
+              echo "Starting backup: $BACKUP_FILE"
+              pg_dump -h $DB_HOST -U $DB_USER $DB_NAME | gzip > /backup/$BACKUP_FILE
+              echo "Backup completed: $BACKUP_FILE"
+
+              # Clean up old backups (keep last 7 days)
+              find /backup -name "backup-*.sql.gz" -mtime +7 -delete
+            env:
+            - name: DB_HOST
+              value: postgres.database.svc.cluster.local
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: DB_NAME
+              value: production
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: backup-pvc
+---
+# Certificate renewal check
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cert-check
+  namespace: production
+spec:
+  schedule: "0 0 * * 0"  # Every Sunday at midnight
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: cert-checker
+          containers:
+          - name: cert-check
+            image: alpine:latest
+            command:
+            - sh
+            - -c
+            - |
+              apk add --no-cache openssl curl
+
+              for domain in example.com api.example.com; do
+                echo "Checking certificate for $domain"
+                expiry=$(echo | openssl s_client -servername $domain -connect $domain:443 2>/dev/null | \
+                         openssl x509 -noout -enddate | cut -d= -f2)
+                echo "Certificate expires: $expiry"
+
+                # Check if expiring in 30 days
+                exp_epoch=$(date -d "$expiry" +%s)
+                now_epoch=$(date +%s)
+                days_left=$(( ($exp_epoch - $now_epoch) / 86400 ))
+
+                if [ $days_left -lt 30 ]; then
+                  echo "WARNING: Certificate for $domain expires in $days_left days!"
+                  # Send alert (implement your alerting mechanism)
+                fi
+              done
+---
+# Log rotation and cleanup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: log-cleanup
+  namespace: production
+spec:
+  schedule: "0 3 * * *"  # Every day at 3 AM
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: cleanup
+            image: alpine:latest
+            command:
+            - sh
+            - -c
+            - |
+              echo "Starting log cleanup..."
+
+              # Delete logs older than 7 days
+              find /logs -type f -name "*.log" -mtime +7 -delete
+
+              # Compress logs older than 1 day
+              find /logs -type f -name "*.log" -mtime +1 ! -name "*.gz" -exec gzip {} \;
+
+              echo "Cleanup completed"
+            volumeMounts:
+            - name: logs
+              mountPath: /logs
+          volumes:
+          - name: logs
+            persistentVolumeClaim:
+              claimName: logs-pvc
+---
+# Metrics collection
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: metrics-export
+  namespace: monitoring
+spec:
+  schedule: "*/15 * * * *"  # Every 15 minutes
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: export
+            image: appropriate/curl:latest
+            command:
+            - sh
+            - -c
+            - |
+              # Export metrics to external system
+              curl -X POST "https://metrics.example.com/api/export" \
+                -H "Authorization: Bearer $API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d @/tmp/metrics.json
+            env:
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: metrics-secret
+                  key: token

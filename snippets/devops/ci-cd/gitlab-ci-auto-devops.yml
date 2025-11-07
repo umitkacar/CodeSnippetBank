@@ -1,0 +1,162 @@
+# GitLab Auto DevOps - Comprehensive pipeline
+include:
+  - template: Auto-DevOps.gitlab-ci.yml
+
+variables:
+  POSTGRES_ENABLED: "true"
+  POSTGRES_VERSION: "16"
+  REDIS_ENABLED: "true"
+  AUTO_DEVOPS_DOMAIN: example.com
+  ROLLOUT_RESOURCE_TYPE: deployment
+  K8S_SECRET_*: # Kubernetes secrets
+
+stages:
+  - build
+  - test
+  - review
+  - dast
+  - staging
+  - canary
+  - production
+  - incremental rollout 10%
+  - incremental rollout 25%
+  - incremental rollout 50%
+  - incremental rollout 100%
+  - performance
+  - cleanup
+
+# Custom build job
+build:
+  extends: .auto-devops
+  stage: build
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - /build/build.sh
+
+# Custom test job with coverage
+test:
+  extends: .auto-devops
+  services:
+    - postgres:16
+    - redis:7-alpine
+  variables:
+    POSTGRES_DB: test
+    POSTGRES_USER: user
+    POSTGRES_PASSWORD: testing-password
+  coverage: '/Coverage: \d+\.\d+/'
+  artifacts:
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+# Code quality
+code_quality:
+  extends: .auto-devops
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+
+# Container scanning
+container_scanning:
+  extends: .auto-devops
+  variables:
+    CS_DISABLE_DEPENDENCY_LIST: "true"
+
+# SAST
+sast:
+  extends: .auto-devops
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+
+# Dependency scanning
+dependency_scanning:
+  extends: .auto-devops
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+
+# License scanning
+license_scanning:
+  extends: .auto-devops
+  artifacts:
+    reports:
+      license_scanning: gl-license-scanning-report.json
+
+# Review app
+review:
+  extends: .auto-devops
+  stage: review
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.$AUTO_DEVOPS_DOMAIN
+    on_stop: stop_review
+  only:
+    - branches
+  except:
+    - main
+
+stop_review:
+  extends: .auto-devops
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - delete
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  when: manual
+  allow_failure: true
+  only:
+    - branches
+  except:
+    - main
+
+# Staging deployment
+staging:
+  extends: .auto-devops
+  stage: staging
+  environment:
+    name: staging
+    url: https://staging.$AUTO_DEVOPS_DOMAIN
+  only:
+    - main
+
+# Canary deployment
+canary:
+  extends: .auto-devops
+  stage: canary
+  environment:
+    name: production
+  when: manual
+  only:
+    - main
+
+# Production deployment
+production:
+  extends: .auto-devops
+  stage: production
+  environment:
+    name: production
+    url: https://$AUTO_DEVOPS_DOMAIN
+  when: manual
+  only:
+    - main
+
+# Performance testing
+performance:
+  extends: .auto-devops
+  stage: performance
+  artifacts:
+    reports:
+      performance: performance.json

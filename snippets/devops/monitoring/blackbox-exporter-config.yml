@@ -1,0 +1,156 @@
+# Blackbox Exporter configuration
+modules:
+  # HTTP 2xx check
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: []  # Defaults to 2xx
+      method: GET
+      preferred_ip_protocol: "ip4"
+      follow_redirects: true
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+
+  # HTTP POST with JSON body
+  http_post_2xx:
+    prober: http
+    http:
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: '{"key": "value"}'
+      valid_status_codes: [200, 201]
+
+  # HTTP with authentication
+  http_2xx_auth:
+    prober: http
+    http:
+      method: GET
+      valid_status_codes: [200]
+      basic_auth:
+        username: "user"
+        password: "pass"
+
+  # HTTP check with custom headers
+  http_custom_headers:
+    prober: http
+    http:
+      method: GET
+      headers:
+        X-Custom-Header: "value"
+        Authorization: "Bearer token"
+      valid_status_codes: [200]
+
+  # HTTPS with certificate validation
+  http_2xx_https:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      preferred_ip_protocol: "ip4"
+      tls_config:
+        insecure_skip_verify: false
+        ca_file: /etc/ssl/certs/ca.crt
+      fail_if_not_ssl: true
+
+  # TCP connection check
+  tcp_connect:
+    prober: tcp
+    timeout: 5s
+
+  # ICMP ping
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"
+
+  # DNS lookup
+  dns_example:
+    prober: dns
+    timeout: 5s
+    dns:
+      transport_protocol: "udp"
+      preferred_ip_protocol: "ip4"
+      query_name: "example.com"
+      query_type: "A"
+
+  # DNS with specific server
+  dns_custom_server:
+    prober: dns
+    dns:
+      transport_protocol: "udp"
+      query_name: "example.com"
+      query_type: "A"
+      dns_server: "8.8.8.8"
+
+  # SMTP check
+  smtp_starttls:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - expect: "^220 "
+        - send: "EHLO prober"
+        - expect: "^250-STARTTLS"
+        - send: "STARTTLS"
+        - expect: "^220"
+        - starttls: true
+        - send: "EHLO prober"
+        - expect: "^250-AUTH"
+        - send: "QUIT"
+
+  # SSH check
+  ssh_banner:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - expect: "^SSH-2.0-"
+
+  # PostgreSQL check
+  postgresql_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      tls: false
+      query_response:
+        - send: "00"  # Startup message
+        - expect: "."
+
+  # MySQL check
+  mysql_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - expect: "."  # Server handshake
+
+  # Redis check
+  redis_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - send: "PING\r\n"
+        - expect: "\\+PONG"
+
+  # gRPC health check
+  grpc_health:
+    prober: grpc
+    timeout: 5s
+    grpc:
+      service: "grpc.health.v1.Health"
+      tls: false
+
+  # gRPC with TLS
+  grpc_health_tls:
+    prober: grpc
+    timeout: 5s
+    grpc:
+      service: "grpc.health.v1.Health"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false

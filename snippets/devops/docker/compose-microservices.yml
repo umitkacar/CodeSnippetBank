@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_DISCOVERY=consul:8500
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - consul
+    networks:
+      - microservices
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build: ./user-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/users
+      - CONSUL_HOST=consul
+    depends_on:
+      - postgres
+      - consul
+    networks:
+      - microservices
+    deploy:
+      replicas: 3
+    restart: unless-stopped
+
+  # Order Service
+  order-service:
+    build: ./order-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/orders
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - CONSUL_HOST=consul
+    depends_on:
+      - postgres
+      - rabbitmq
+      - consul
+    networks:
+      - microservices
+    deploy:
+      replicas: 3
+    restart: unless-stopped
+
+  # Product Service
+  product-service:
+    build: ./product-service
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/products
+      - REDIS_URL=redis://redis:6379
+      - CONSUL_HOST=consul
+    depends_on:
+      - mongo
+      - redis
+      - consul
+    networks:
+      - microservices
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+
+  # PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - microservices
+    restart: unless-stopped
+
+  # MongoDB
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - microservices
+    restart: unless-stopped
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    networks:
+      - microservices
+    restart: unless-stopped
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - microservices
+    restart: unless-stopped
+
+  # Consul (Service Discovery)
+  consul:
+    image: consul:latest
+    ports:
+      - "8500:8500"
+    command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
+    networks:
+      - microservices
+    restart: unless-stopped
+
+networks:
+  microservices:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  mongo-data:
+  redis-data:
+  rabbitmq-data:

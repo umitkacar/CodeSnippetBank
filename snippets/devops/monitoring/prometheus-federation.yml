@@ -1,0 +1,91 @@
+# Prometheus federation configuration for multi-cluster monitoring
+# Global Prometheus that scrapes from regional Prometheus instances
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    cluster: 'global'
+    region: 'us'
+
+scrape_configs:
+  # Federate from US-East cluster
+  - job_name: 'federate-us-east'
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="kubernetes-apiservers"}'
+        - '{job="kubernetes-nodes"}'
+        - '{job="kubernetes-pods"}'
+        - '{__name__=~"job:.*"}'  # Recording rules
+        - '{__name__=~"node:.*"}' # Node metrics
+    static_configs:
+      - targets:
+          - 'prometheus-us-east.example.com:9090'
+        labels:
+          cluster: 'us-east'
+          region: 'us-east-1'
+
+  # Federate from US-West cluster
+  - job_name: 'federate-us-west'
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="kubernetes-apiservers"}'
+        - '{job="kubernetes-nodes"}'
+        - '{job="kubernetes-pods"}'
+        - '{__name__=~"job:.*"}'
+        - '{__name__=~"node:.*"}'
+    static_configs:
+      - targets:
+          - 'prometheus-us-west.example.com:9090'
+        labels:
+          cluster: 'us-west'
+          region: 'us-west-2'
+
+  # Federate from EU cluster
+  - job_name: 'federate-eu'
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="kubernetes-apiservers"}'
+        - '{job="kubernetes-nodes"}'
+        - '{job="kubernetes-pods"}'
+        - '{__name__=~"job:.*"}'
+        - '{__name__=~"node:.*"}'
+    static_configs:
+      - targets:
+          - 'prometheus-eu.example.com:9090'
+        labels:
+          cluster: 'eu'
+          region: 'eu-west-1'
+
+# Alert rules for global monitoring
+rule_files:
+  - '/etc/prometheus/rules/global-alerts.yml'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager-global.example.com:9093'
+      timeout: 10s
+
+# Remote write for long-term storage
+remote_write:
+  - url: "https://prometheus-long-term.example.com/api/v1/write"
+    queue_config:
+      capacity: 100000
+      max_shards: 200
+      min_shards: 1
+      max_samples_per_send: 10000
+      batch_send_deadline: 5s
+    write_relabel_configs:
+      # Drop high-cardinality metrics
+      - source_labels: [__name__]
+        regex: 'node_network_transmit_packets_total|node_network_receive_packets_total'
+        action: drop

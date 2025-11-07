@@ -1,0 +1,115 @@
+# Buildkite pipeline configuration
+agents:
+  queue: "default"
+
+env:
+  NODE_VERSION: "20"
+  DOCKER_BUILDKIT: "1"
+
+steps:
+  - label: ":nodejs: Install Dependencies"
+    key: "install"
+    command:
+      - "nvm use ${NODE_VERSION}"
+      - "npm ci"
+    artifact_paths:
+      - "node_modules/**/*"
+
+  - wait
+
+  - label: ":eslint: Lint"
+    key: "lint"
+    depends_on: "install"
+    command:
+      - "npm run lint"
+    plugins:
+      - artifacts#v1.9.0:
+          download: "node_modules/**/*"
+
+  - label: ":jest: Unit Tests"
+    key: "test-unit"
+    depends_on: "install"
+    command:
+      - "npm run test:unit -- --coverage"
+    artifact_paths:
+      - "coverage/**/*"
+    plugins:
+      - artifacts#v1.9.0:
+          download: "node_modules/**/*"
+
+  - label: ":jest: Integration Tests"
+    key: "test-integration"
+    depends_on: "install"
+    command:
+      - "npm run test:integration"
+    plugins:
+      - docker-compose#v4.16.0:
+          run: app
+          config: docker-compose.test.yml
+      - artifacts#v1.9.0:
+          download: "node_modules/**/*"
+
+  - wait
+
+  - label: ":package: Build"
+    key: "build"
+    depends_on:
+      - "lint"
+      - "test-unit"
+    command:
+      - "npm run build"
+    artifact_paths:
+      - "dist/**/*"
+    plugins:
+      - artifacts#v1.9.0:
+          download: "node_modules/**/*"
+
+  - wait
+
+  - label: ":docker: Build Image"
+    key: "docker-build"
+    depends_on: "build"
+    branches: "main"
+    command:
+      - "docker build -t myapp:${BUILDKITE_COMMIT:0:7} ."
+      - "docker tag myapp:${BUILDKITE_COMMIT:0:7} myapp:latest"
+    agents:
+      queue: "docker"
+
+  - label: ":shield: Security Scan"
+    key: "security"
+    depends_on: "docker-build"
+    command:
+      - "trivy image myapp:${BUILDKITE_COMMIT:0:7}"
+    agents:
+      queue: "docker"
+
+  - wait
+
+  - block: ":rocket: Deploy to Production?"
+    branches: "main"
+
+  - label: ":kubernetes: Deploy"
+    key: "deploy"
+    depends_on: "security"
+    branches: "main"
+    command:
+      - "kubectl set image deployment/myapp myapp=myapp:${BUILDKITE_COMMIT:0:7} -n production"
+      - "kubectl rollout status deployment/myapp -n production"
+    concurrency: 1
+    concurrency_group: "production-deploy"
+
+  - wait
+
+  - label: ":bar_chart: Smoke Tests"
+    depends_on: "deploy"
+    branches: "main"
+    command:
+      - "./scripts/smoke-tests.sh production"
+    soft_fail: true
+
+notify:
+  - slack: "#deployments"
+    if: build.state == "passed" && build.branch == "main"
+  - slack: "#alerts"
+    if: build.state == "failed"

@@ -1,0 +1,139 @@
+# Grafana datasource provisioning
+apiVersion: 1
+
+datasources:
+  # Prometheus
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      timeInterval: '30s'
+      queryTimeout: '60s'
+      httpMethod: POST
+    editable: true
+
+  # Loki
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: jaeger
+          matcherRegex: "trace_id=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+    editable: true
+
+  # Jaeger
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    jsonData:
+      tracesToLogs:
+        datasourceUid: loki
+        tags: ['trace_id']
+        mappedTags: [{ key: 'trace_id', value: 'trace_id' }]
+        mapTagNamesEnabled: true
+        filterByTraceID: true
+        filterBySpanID: false
+    editable: true
+
+  # Elasticsearch
+  - name: Elasticsearch
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "[filebeat-]YYYY.MM.DD"
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      esVersion: "8.0.0"
+      logMessageField: message
+      logLevelField: level
+    editable: true
+
+  # PostgreSQL
+  - name: PostgreSQL
+    type: postgres
+    url: postgres:5432
+    database: mydb
+    user: grafana
+    secureJsonData:
+      password: secret
+    jsonData:
+      sslmode: 'disable'
+      postgresVersion: 1600
+      timescaledb: false
+    editable: true
+
+  # MySQL
+  - name: MySQL
+    type: mysql
+    url: mysql:3306
+    database: mydb
+    user: grafana
+    secureJsonData:
+      password: secret
+    jsonData:
+      maxOpenConns: 10
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true
+
+  # InfluxDB
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: telegraf
+    user: admin
+    secureJsonData:
+      password: admin
+    jsonData:
+      httpMode: GET
+      version: '1.8'
+    editable: true
+
+  # CloudWatch
+  - name: CloudWatch
+    type: cloudwatch
+    jsonData:
+      authType: keys
+      defaultRegion: us-east-1
+    secureJsonData:
+      accessKey: YOUR_ACCESS_KEY
+      secretKey: YOUR_SECRET_KEY
+    editable: true
+
+  # Azure Monitor
+  - name: Azure Monitor
+    type: grafana-azure-monitor-datasource
+    access: proxy
+    jsonData:
+      cloudName: azuremonitor
+      subscriptionId: YOUR_SUBSCRIPTION_ID
+      tenantId: YOUR_TENANT_ID
+      clientId: YOUR_CLIENT_ID
+    secureJsonData:
+      clientSecret: YOUR_CLIENT_SECRET
+    editable: true
+
+  # Graphite
+  - name: Graphite
+    type: graphite
+    access: proxy
+    url: http://graphite:80
+    jsonData:
+      graphiteVersion: '1.1'
+    editable: true
+
+  # TestData
+  - name: TestData
+    type: testdata
+    access: proxy
+    editable: false

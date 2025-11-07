@@ -1,0 +1,119 @@
+name: Matrix Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-matrix:
+    name: Test on ${{ matrix.os }} with Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [18, 20, 21]
+        exclude:
+          # Exclude Node 21 on Windows
+          - os: windows-latest
+            node: 21
+        include:
+          # Add specific configuration
+          - os: ubuntu-latest
+            node: 20
+            experimental: false
+          - os: ubuntu-latest
+            node: 21
+            experimental: true
+    continue-on-error: ${{ matrix.experimental || false }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm test
+
+    - name: Upload coverage
+      if: matrix.os == 'ubuntu-latest' && matrix.node == 20
+      uses: codecov/codecov-action@v3
+
+  test-databases:
+    name: Test with ${{ matrix.database }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database:
+          - postgres:14
+          - postgres:15
+          - postgres:16
+          - mysql:8.0
+          - mysql:8.1
+    services:
+      database:
+        image: ${{ matrix.database }}
+        env:
+          POSTGRES_PASSWORD: postgres
+          MYSQL_ROOT_PASSWORD: mysql
+        options: >-
+          --health-cmd="pg_isready || mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 5432:5432
+          - 3306:3306
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run integration tests
+      env:
+        DATABASE_TYPE: ${{ contains(matrix.database, 'postgres') && 'postgres' || 'mysql' }}
+      run: npm run test:integration
+
+  test-browsers:
+    name: E2E tests on ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Run E2E tests
+      run: npm run test:e2e -- --project=${{ matrix.browser }}
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-results-${{ matrix.browser }}
+        path: playwright-report/

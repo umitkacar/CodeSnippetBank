@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-stable
+  namespace: production
+  labels:
+    app: web-app
+    track: stable
+spec:
+  replicas: 9
+  selector:
+    matchLabels:
+      app: web-app
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: web-app
+        track: stable
+        version: v1.0.0
+    spec:
+      containers:
+      - name: web-app
+        image: myregistry/web-app:1.0.0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-canary
+  namespace: production
+  labels:
+    app: web-app
+    track: canary
+spec:
+  replicas: 1  # 10% canary traffic
+  selector:
+    matchLabels:
+      app: web-app
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: web-app
+        track: canary
+        version: v2.0.0
+    spec:
+      containers:
+      - name: web-app
+        image: myregistry/web-app:2.0.0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: production
+spec:
+  selector:
+    app: web-app  # Matches both stable and canary
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP

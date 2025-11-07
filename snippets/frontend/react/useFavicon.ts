@@ -1,0 +1,21 @@
+import { useEffect } from 'react';
+
+/**
+ * Custom hook to update favicon
+ */
+export function useFavicon(href: string) {
+  useEffect(() => {
+    const link: HTMLLinkElement =
+      document.querySelector("link[rel*='icon']") ||
+      document.createElement('link');
+
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = href;
+
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, [href]);
+}
+
+// Usage:
+// useFavicon('/new-favicon.ico');

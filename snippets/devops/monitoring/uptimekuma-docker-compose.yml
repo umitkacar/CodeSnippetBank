@@ -1,0 +1,41 @@
+# Uptime Kuma - Self-hosted monitoring tool
+version: '3.8'
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=America/New_York
+      - UPTIME_KUMA_PORT=3001
+    restart: unless-stopped
+    networks:
+      - monitoring
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Optional: Cloudflare Tunnel for secure access
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    networks:
+      - monitoring
+    depends_on:
+      - uptime-kuma
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  uptime-kuma-data:
+    driver: local

@@ -1,0 +1,105 @@
+version: '3.8'
+
+# PostgreSQL with streaming replication
+services:
+  postgres-primary:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=replicator
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=mydb
+      - POSTGRES_REPLICATION_MODE=master
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
+    command: |
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=3
+      -c max_replication_slots=3
+      -c hot_standby=on
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-primary-data:/var/lib/postgresql/data
+      - ./postgres/primary-init.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      - postgres-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U replicator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-replica-1:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=replicator
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_REPLICATION_MODE=slave
+      - POSTGRES_MASTER_SERVICE=postgres-primary
+      - POSTGRES_MASTER_PORT=5432
+    command: |
+      bash -c "
+      until pg_basebackup -h postgres-primary -D /var/lib/postgresql/data -U replicator -vP -W
+      do
+        echo 'Waiting for primary to be ready...'
+        sleep 5
+      done
+      postgres
+      "
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-replica1-data:/var/lib/postgresql/data
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    networks:
+      - postgres-network
+
+  postgres-replica-2:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=replicator
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_REPLICATION_MODE=slave
+      - POSTGRES_MASTER_SERVICE=postgres-primary
+      - POSTGRES_MASTER_PORT=5432
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-replica2-data:/var/lib/postgresql/data
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    networks:
+      - postgres-network
+
+  pgpool:
+    image: bitnami/pgpool:latest
+    ports:
+      - "5430:5432"
+    environment:
+      - PGPOOL_BACKEND_NODES=0:postgres-primary:5432,1:postgres-replica-1:5432,2:postgres-replica-2:5432
+      - PGPOOL_SR_CHECK_USER=replicator
+      - PGPOOL_SR_CHECK_PASSWORD=${POSTGRES_PASSWORD}
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=replicator
+      - PGPOOL_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      - postgres-primary
+      - postgres-replica-1
+      - postgres-replica-2
+    networks:
+      - postgres-network
+
+networks:
+  postgres-network:
+    driver: bridge
+
+volumes:
+  postgres-primary-data:
+  postgres-replica1-data:
+  postgres-replica2-data:
