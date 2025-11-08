@@ -1,6 +1,22 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { watch, onUnmounted } from 'vue';
+import { Ref } from 'vue';
 
-export function ${file}() {
-  const value = ref(null);
-  return { value };
+export function useTitle(title: Ref<string> | string) {
+  const originalTitle = document.title;
+
+  if (typeof title === 'string') {
+    document.title = title;
+  } else {
+    watch(
+      title,
+      (newTitle) => {
+        document.title = newTitle;
+      },
+      { immediate: true }
+    );
+  }
+
+  onUnmounted(() => {
+    document.title = originalTitle;
+  });
 }

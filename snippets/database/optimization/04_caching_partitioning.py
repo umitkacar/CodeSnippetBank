@@ -198,7 +198,7 @@ def warm_cache():
 # ============================================================================
 
 # Snippet 9: Range partitioning by date
-RANGE_PARTITION_SQL = """
+RANGE_PARTITION_SQL: str = """
 -- Create partitioned table
 CREATE TABLE orders (
     order_id SERIAL,
@@ -227,7 +227,7 @@ CREATE INDEX idx_orders_2024_02_customer ON orders_2024_02(customer_id);
 """
 
 # Snippet 10: List partitioning by region
-LIST_PARTITION_SQL = """
+LIST_PARTITION_SQL: str = """
 -- Create partitioned table
 CREATE TABLE customers (
     customer_id SERIAL,
@@ -250,7 +250,7 @@ CREATE TABLE customers_other PARTITION OF customers DEFAULT;
 """
 
 # Snippet 11: Hash partitioning for even distribution
-HASH_PARTITION_SQL = """
+HASH_PARTITION_SQL: str = """
 -- Create partitioned table
 CREATE TABLE events (
     event_id BIGSERIAL,
@@ -297,7 +297,7 @@ def create_monthly_partition(table_name: str, year: int, month: int):
     print(f"Created partition: {partition_name}")
 
 # Snippet 13: Partition maintenance
-def maintain_partitions():
+def maintain_partitions() -> None:
     """Drop old partitions and create future ones"""
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
@@ -443,32 +443,32 @@ class GeoShardRouter:
         return 'us'
 
 # Helper functions (placeholders)
-def fetch_user_from_db(user_id: int) -> Dict:
+def fetch_user_from_db(user_id: int) -> Dict[str, Any]:
     pass
 
-def update_user_in_db(user_id: int, data: Dict) -> bool:
+def update_user_in_db(user_id: int, data: Dict[str, Any]) -> bool:
     pass
 
-def bulk_update_db(batch: List):
+def bulk_update_db(batch: List[Any]) -> None:
     pass
 
-def get_top_users_from_db(limit: int) -> List[Dict]:
+def get_top_users_from_db(limit: int) -> List[Dict[str, Any]]:
     pass
 
-def execute_sql(sql: str):
+def execute_sql(sql: str) -> None:
     pass
 
 def get_old_partitions(table_name: str, cutoff_date: datetime) -> List[str]:
     pass
 
-def archive_partition(partition: str):
+def archive_partition(partition: str) -> None:
     pass
 
-def drop_partition(partition: str):
+def drop_partition(partition: str) -> None:
     pass
 
-def create_connection(connection_string: str):
+def create_connection(connection_string: str) -> Any:
     pass
 
-def execute_query(connection, sql: str, params: tuple = None):
+def execute_query(connection: Any, sql: str, params: Optional[tuple] = None) -> Any:
     pass

@@ -4,12 +4,12 @@ Comprehensive fixture patterns and best practices
 """
 
 import pytest
-from typing import Generator, Dict, List
+from typing import Generator, Dict, List, Any
 
 
 # Basic fixtures
 @pytest.fixture
-def sample_user() -> Dict[str, any]:
+def sample_user() -> Dict[str, Any]:
     """Fixture providing a sample user"""
     return {
         "id": 1,
@@ -20,7 +20,7 @@ def sample_user() -> Dict[str, any]:
 
 
 @pytest.fixture
-def sample_users() -> List[Dict[str, any]]:
+def sample_users() -> List[Dict[str, Any]]:
     """Fixture providing multiple users"""
     return [
         {"id": 1, "name": "John Doe", "email": "john@example.com"},

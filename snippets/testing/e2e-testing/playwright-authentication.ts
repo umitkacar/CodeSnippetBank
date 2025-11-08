@@ -1,7 +1,7 @@
-// ${file} E2E Testing
+// PlaywrightAuthentication E2E Testing
 // Production-ready end-to-end testing patterns
 
-describe('${file} E2E Tests', () => {
+describe('PlaywrightAuthentication E2E Tests', () => {
   beforeAll(() => {
     // Global setup
   });

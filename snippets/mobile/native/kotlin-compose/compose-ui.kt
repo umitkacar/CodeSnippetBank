@@ -1,6 +1,10 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -152,21 +156,21 @@ fun BottomNavigationBar(
         NavigationBarItem(
             selected = selectedIndex == 0,
             onClick = { onItemSelected(0) },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
             label = { Text("Home") }
         )
 
         NavigationBarItem(
             selected = selectedIndex == 1,
             onClick = { onItemSelected(1) },
-            icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+            icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
             label = { Text("Search") }
         )
 
         NavigationBarItem(
             selected = selectedIndex == 2,
             onClick = { onItemSelected(2) },
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             label = { Text("Profile") }
         )
     }

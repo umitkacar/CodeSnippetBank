@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface FlashProps {
+  children: ReactNode;
+}
+
+export const Flash = ({ children }: FlashProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{ opacity: [1, 0, 1, 0, 1] }}
+    transition={{ duration: 1 }}
   >
     {children}
   </motion.div>

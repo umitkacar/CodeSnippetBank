@@ -26,6 +26,8 @@ type HomeStackParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+const ProfileStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 // Home Stack Navigator
@@ -138,3 +140,15 @@ export const DrawerNavigatorExample: React.FC = () => {
     </Drawer.Navigator>
   );
 };
+
+// Placeholder components for demonstration
+const HomeScreen = () => null;
+const HomeDetailsScreen = () => null;
+const ProfileScreen = () => null;
+const EditProfileScreen = () => null;
+const SettingsScreen = () => null;
+const SettingsDetailsScreen = () => null;
+const ModalScreen = () => null;
+const DetailsScreen = () => null;
+const NotificationsScreen = () => null;
+const HelpScreen = () => null;

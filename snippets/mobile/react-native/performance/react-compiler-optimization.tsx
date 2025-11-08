@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useCallback, useTransition, useDeferredValue } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, Button, ActivityIndicator } from 'react-native';
+import { useSelector } from 'react-redux';
 
 // React 18+ Concurrent features
 export const SearchWithDeferred: React.FC = () => {
@@ -171,3 +172,42 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
+
+// Placeholder data and components
+const items = Array.from({ length: 100 }, (_, i) => ({
+  id: i.toString(),
+  title: `Item ${i + 1}`,
+  description: `Description ${i + 1}`,
+}));
+
+interface AppState {
+  user: {
+    name: string;
+    posts: any[];
+  };
+}
+
+const ListItem = ({ item, onPress }: any) => (
+  <View style={{ padding: 16 }}>
+    <Text onPress={onPress}>{item.formatted || item.title}</Text>
+  </View>
+);
+
+const TabContent = ({ tab }: { tab: string }) => (
+  <View>
+    <Text>{tab} Content</Text>
+  </View>
+);
+
+const PostList = ({ posts }: { posts: any[] }) => (
+  <View>
+    {posts.map((post, i) => (
+      <Text key={i}>{post.title}</Text>
+    ))}
+  </View>
+);
+
+const LoadingSkeleton = () => <Text>Loading...</Text>;
+const Header = () => <Text>Header</Text>;
+const HeavyContent = () => <Text>Heavy Content</Text>;
+const Footer = () => <Text>Footer</Text>;

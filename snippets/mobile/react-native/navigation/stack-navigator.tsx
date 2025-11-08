@@ -48,3 +48,8 @@ export const AppNavigator: React.FC = () => {
     </NavigationContainer>
   );
 };
+
+// Placeholder components for demonstration
+const HomeScreen = () => null;
+const DetailsScreen = () => null;
+const ProfileScreen = () => null;

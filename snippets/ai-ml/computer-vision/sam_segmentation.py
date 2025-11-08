@@ -3,10 +3,16 @@ SAM (Segment Anything Model) Segmentation
 Automatic and prompt-based image segmentation using Meta's SAM.
 """
 
-import cv2
-import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
+
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    import numpy as np
 
 try:
     from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
@@ -14,6 +20,11 @@ try:
     SAM_AVAILABLE = True
 except ImportError:
     SAM_AVAILABLE = False
+    # Create placeholder if torch not available
+    try:
+        import torch
+    except ImportError:
+        pass
 
 
 @dataclass
@@ -52,8 +63,10 @@ class SAMSegmenter:
             checkpoint_path: Path to SAM checkpoint
             device: Device to run on
         """
+        if not CV2_AVAILABLE:
+            raise ImportError("opencv-python not installed. Install with: pip install opencv-python")
         if not SAM_AVAILABLE:
-            raise ImportError("segment-anything not installed")
+            raise ImportError("segment-anything not installed. Install with: pip install segment-anything")
 
         self.device = device
         self.model = sam_model_registry[model_type](checkpoint=checkpoint_path)
@@ -340,8 +353,14 @@ class SAMSegmenter:
 
 # Usage Examples
 if __name__ == "__main__":
+    if not CV2_AVAILABLE:
+        print("Error: opencv-python not installed")
+        print("Install with: pip install opencv-python")
+        exit(1)
+
     if not SAM_AVAILABLE:
-        print("Please install segment-anything: pip install segment-anything")
+        print("Error: segment-anything not installed")
+        print("Install with: pip install segment-anything")
         exit(1)
 
     print("SAM Segmentation Examples")

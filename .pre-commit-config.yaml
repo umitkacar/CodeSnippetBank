@@ -1,0 +1,194 @@
+# Pre-commit hooks configuration for modern Python development
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+# Update hooks: pre-commit autoupdate
+
+default_language_version:
+  python: python3.9
+
+repos:
+  # =============================================================================
+  # RUFF - Modern Python linter and formatter (replaces black, flake8, isort)
+  # =============================================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Run the linter
+      - id: ruff
+        name: ruff lint
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+      # Run the formatter
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi]
+
+  # =============================================================================
+  # MYPY - Static type checking
+  # =============================================================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: mypy type check
+        additional_dependencies:
+          - types-Pillow
+        args: [--strict, --show-error-codes]
+        exclude: ^(tests/|setup.py)
+
+  # =============================================================================
+  # BUILT-IN PRE-COMMIT HOOKS - File and syntax checks
+  # =============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # File content checks
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+        name: fix end of files
+      - id: mixed-line-ending
+        name: fix mixed line endings
+        args: [--fix=lf]
+
+      # File size and merge conflict checks
+      - id: check-added-large-files
+        name: check for large files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+        name: check for merge conflicts
+
+      # Syntax and format validation
+      - id: check-yaml
+        name: check yaml syntax
+        args: [--safe]
+      - id: check-toml
+        name: check toml syntax
+      - id: check-json
+        name: check json syntax
+      - id: check-xml
+        name: check xml syntax
+
+      # Python-specific checks
+      - id: check-ast
+        name: check python ast
+      - id: check-builtin-literals
+        name: check builtin literals
+      - id: check-docstring-first
+        name: check docstring first
+      - id: debug-statements
+        name: check for debug statements
+      - id: name-tests-test
+        name: check test naming
+        args: [--pytest-test-first]
+
+      # Security and sensitive data
+      - id: detect-private-key
+        name: detect private keys
+
+      # Code quality
+      - id: fix-byte-order-marker
+        name: fix byte order marker
+
+  # =============================================================================
+  # PYTEST - Run tests before commit (optional, can be slow)
+  # =============================================================================
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        args:
+          - tests/
+          - -v
+          - --tb=short
+          - -x
+          - --maxfail=5
+          - -m
+          - "not slow"
+        stages: [commit]
+        # Uncomment to run only on manual trigger instead of every commit
+        # stages: [manual]
+
+  # =============================================================================
+  # SECURITY - Additional security checks
+  # =============================================================================
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        name: bandit security check
+        args: [-c, pyproject.toml, -r, .]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: ^tests/
+
+  # =============================================================================
+  # DOCUMENTATION - Check docstrings and documentation
+  # =============================================================================
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: pydocstyle docstring check
+        args:
+          - --convention=google
+          - --add-ignore=D100,D101,D102,D103,D104,D105,D107
+        exclude: ^(tests/|setup.py)
+        # Uncomment to enable strict docstring checking
+        # args: [--convention=google]
+
+  # =============================================================================
+  # NOTEBOOK CHECKS - For Jupyter notebooks (if any)
+  # =============================================================================
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.9.1
+    hooks:
+      - id: nbqa-ruff
+        name: nbqa-ruff
+        args: [--fix]
+      - id: nbqa-mypy
+        name: nbqa-mypy
+        additional_dependencies: [mypy>=1.13.0]
+
+  # =============================================================================
+  # COMMIT MESSAGE - Conventional commits (optional)
+  # =============================================================================
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+      - id: conventional-pre-commit
+        name: conventional commits
+        stages: [commit-msg]
+        # Uncomment to enforce conventional commits
+        # args: []
+
+  # =============================================================================
+  # YAML/JSON FORMATTING
+  # =============================================================================
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        name: prettier format
+        types_or: [yaml, json, markdown]
+        args: [--prose-wrap=always, --print-width=100]
+        exclude: ^(package-lock.json|poetry.lock)
+
+# =============================================================================
+# CI Configuration
+# =============================================================================
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: [pytest-check]
+  submodules: false

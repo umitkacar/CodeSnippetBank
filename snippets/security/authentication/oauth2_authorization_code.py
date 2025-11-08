@@ -180,9 +180,14 @@ class OAuth2Client:
 
 # Example usage
 if __name__ == "__main__":
+    import os
+
+    # Use environment variables for OAuth credentials:
+    # export OAUTH_CLIENT_ID="your_client_id"
+    # export OAUTH_CLIENT_SECRET="your_client_secret"
     oauth_client = OAuth2Client(
-        client_id="your_client_id",
-        client_secret="your_client_secret",
+        client_id=os.getenv("OAUTH_CLIENT_ID", "your_client_id"),
+        client_secret=os.getenv("OAUTH_CLIENT_SECRET", "your_client_secret"),
         authorization_url="https://provider.com/oauth/authorize",
         token_url="https://provider.com/oauth/token",
         redirect_uri="https://yourapp.com/callback"

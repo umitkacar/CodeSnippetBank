@@ -3,11 +3,17 @@ Object Tracking
 Multi-object tracking with various algorithms (SORT, DeepSORT, ByteTrack).
 """
 
-import cv2
-import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from collections import deque
+
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    import numpy as np
 
 
 @dataclass

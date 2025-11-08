@@ -7,8 +7,27 @@ import os
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 import time
-from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
-from tenacity import retry, stop_after_attempt, wait_exponential
+
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+
+try:
+    from tenacity import retry, stop_after_attempt, wait_exponential
+    TENACITY_AVAILABLE = True
+except ImportError:
+    TENACITY_AVAILABLE = False
+    # Fallback decorator if tenacity not available
+    def retry(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+    def stop_after_attempt(n):
+        return None
+    def wait_exponential(**kwargs):
+        return None
 
 
 @dataclass
@@ -39,7 +58,14 @@ class ClaudeClient:
             model: Model name (claude-3-opus, claude-3-sonnet, claude-3-haiku)
             max_tokens: Maximum tokens in response
             temperature: Sampling temperature (0.0 to 1.0)
+
+        Raises:
+            ImportError: If anthropic package not installed
+            ValueError: If API key not provided
         """
+        if not ANTHROPIC_AVAILABLE:
+            raise ImportError("anthropic not installed. Install with: pip install anthropic")
+
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError("Anthropic API key not provided")
@@ -278,11 +304,21 @@ class ClaudeToolsClient:
 
 # Usage Examples
 if __name__ == "__main__":
-    # Initialize client
-    client = ClaudeClient(
-        model="claude-3-sonnet-20240229",
-        max_tokens=2000
-    )
+    if not ANTHROPIC_AVAILABLE:
+        print("Error: anthropic package not installed")
+        print("Install with: pip install anthropic")
+        exit(1)
+
+    try:
+        # Initialize client
+        client = ClaudeClient(
+            model="claude-3-sonnet-20240229",
+            max_tokens=2000
+        )
+    except ValueError as e:
+        print(f"Error: {e}")
+        print("Please set ANTHROPIC_API_KEY environment variable")
+        exit(1)
 
     # Single completion
     response = client.complete(

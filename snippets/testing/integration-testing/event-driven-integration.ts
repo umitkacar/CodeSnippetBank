@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// EventDrivenIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('EventDrivenIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

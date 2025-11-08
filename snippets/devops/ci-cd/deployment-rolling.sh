@@ -1,15 +1,33 @@
 #!/bin/bash
 # Rolling deployment strategy for Kubernetes
+# Safely deploys a new version of an application with rolling updates
 
-set -e
+set -euo pipefail  # Exit on error, undefined vars, and pipe failures
+IFS=$'\n\t'  # Set safer internal field separator
 
 NAMESPACE="${NAMESPACE:-production}"
-DEPLOYMENT="${1}"
-IMAGE="${2}"
+DEPLOYMENT="${1:-}"
+IMAGE="${2:-}"
 TIMEOUT=600
 
+# Validate required arguments
 if [ -z "$DEPLOYMENT" ] || [ -z "$IMAGE" ]; then
+    echo "ERROR: Missing required arguments"
     echo "Usage: $0 <deployment-name> <image>"
+    echo ""
+    echo "Example: $0 myapp myregistry/myapp:v1.2.3"
+    exit 1
+fi
+
+# Verify kubectl is installed
+if ! command -v kubectl &> /dev/null; then
+    echo "ERROR: kubectl is not installed or not in PATH"
+    exit 1
+fi
+
+# Verify deployment exists
+if ! kubectl get deployment "${DEPLOYMENT}" -n "${NAMESPACE}" &> /dev/null; then
+    echo "ERROR: Deployment '${DEPLOYMENT}' not found in namespace '${NAMESPACE}'"
     exit 1
 fi
 
@@ -32,12 +50,20 @@ kubectl set image deployment/${DEPLOYMENT} \
 
 # Watch rollout
 echo "Rolling out update..."
-kubectl rollout status deployment/${DEPLOYMENT} \
+if ! kubectl rollout status deployment/${DEPLOYMENT} \
     -n ${NAMESPACE} \
-    --timeout=${TIMEOUT}s
+    --timeout=${TIMEOUT}s; then
+    echo ""
+    echo "ERROR: Rollout failed or timed out!"
+    echo "Rolling back to previous version..."
+    kubectl rollout undo deployment/${DEPLOYMENT} -n ${NAMESPACE}
+    echo "Rollback initiated. Check status with:"
+    echo "  kubectl rollout status deployment/${DEPLOYMENT} -n ${NAMESPACE}"
+    exit 1
+fi
 
 # Verify deployment
-echo
+echo ""
 echo "Verifying deployment..."
 kubectl get deployment ${DEPLOYMENT} -n ${NAMESPACE}
 

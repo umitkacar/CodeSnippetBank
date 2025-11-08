@@ -6,7 +6,7 @@ import hashlib
 import json
 import time
 from functools import wraps
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 app = FastAPI()
 
@@ -97,7 +97,7 @@ async def get_cached_data(item_id: int, request: Request):
     return DataModel(
         id=item_id,
         value=f"Data for item {item_id}",
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     )
 
 @app.get("/expensive-operation")
@@ -108,7 +108,7 @@ async def expensive_operation(request: Request):
 
     return {
         "result": "Expensive computation result",
-        "computed_at": datetime.utcnow().isoformat()
+        "computed_at": datetime.now(timezone.utc).isoformat()
     }
 
 # Manual cache control
@@ -151,7 +151,7 @@ async def get_data_with_etag(item_id: int, request: Request, response: Response)
     data = {
         "id": item_id,
         "value": f"Data for item {item_id}",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
     etag = generate_etag(data)
@@ -198,13 +198,13 @@ async def get_with_cache_headers(item_id: int, response: Response):
     data = {
         "id": item_id,
         "value": f"Data for item {item_id}",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
     # Set cache control headers
     response.headers["Cache-Control"] = "public, max-age=300"
     response.headers["Expires"] = (
-        datetime.utcnow() + timedelta(seconds=300)
+        datetime.now(timezone.utc) + timedelta(seconds=300)
     ).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     return data

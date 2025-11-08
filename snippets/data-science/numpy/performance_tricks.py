@@ -3,8 +3,11 @@ NumPy Performance Tricks Snippets
 Production-ready examples for optimizing NumPy code
 """
 
-import numpy as np
-from typing import Callable
+try:
+    import numpy as np
+    from typing import Callable
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def use_inplace_operations(arr: np.ndarray) -> np.ndarray:
@@ -125,19 +128,18 @@ def parallel_computation_with_numba():
     """Use Numba for parallel computation"""
     try:
         from numba import jit, prange
-
-        @jit(nopython=True, parallel=True)
-        def parallel_sum(arr):
-            total = 0.0
-            for i in prange(len(arr)):
-                total += arr[i] ** 2
-            return total
-
-        arr = np.random.rand(1000000)
-        return parallel_sum(arr)
     except ImportError:
-        print("Install numba: pip install numba")
-        return None
+        raise ImportError("numba not installed. Install with: pip install numba")
+
+    @jit(nopython=True, parallel=True)
+    def parallel_sum(arr):
+        total = 0.0
+        for i in prange(len(arr)):
+            total += arr[i] ** 2
+        return total
+
+    arr = np.random.rand(1000000)
+    return parallel_sum(arr)
 
 
 def use_stride_tricks_for_windows(arr: np.ndarray, window_size: int) -> np.ndarray:

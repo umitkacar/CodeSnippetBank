@@ -1,6 +1,22 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
-export function ${file}() {
-  const value = ref(null);
-  return { value };
+export function useMediaQuery(query: string) {
+  const matches = ref(false);
+
+  onMounted(() => {
+    const mediaQuery = window.matchMedia(query);
+    matches.value = mediaQuery.matches;
+
+    const handler = (event: MediaQueryListEvent) => {
+      matches.value = event.matches;
+    };
+
+    mediaQuery.addEventListener('change', handler);
+
+    onUnmounted(() => {
+      mediaQuery.removeEventListener('change', handler);
+    });
+  });
+
+  return matches;
 }

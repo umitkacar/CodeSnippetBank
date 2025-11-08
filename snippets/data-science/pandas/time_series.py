@@ -3,9 +3,12 @@ Pandas Time Series Snippets
 Production-ready examples for time series analysis
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import Optional
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def create_date_range(start: str, end: str, freq: str = 'D') -> pd.DatetimeIndex:

@@ -1,7 +1,7 @@
-// ${file} E2E Testing
+// CookieManagement E2E Testing
 // Production-ready end-to-end testing patterns
 
-describe('${file} E2E Tests', () => {
+describe('CookieManagement E2E Tests', () => {
   beforeAll(() => {
     // Global setup
   });

@@ -1,10 +1,17 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface TadaProps {
+  children: ReactNode;
+}
+
+export const Tada = ({ children }: TadaProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{
+      scale: [1, 0.9, 0.9, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1],
+      rotate: [0, -3, -3, 3, -3, 3, -3, 3, -3, 0]
+    }}
+    transition={{ duration: 1 }}
   >
     {children}
   </motion.div>

@@ -1,7 +1,7 @@
-// ${file} E2E Testing
+// ScreenshotTesting E2E Testing
 // Production-ready end-to-end testing patterns
 
-describe('${file} E2E Tests', () => {
+describe('ScreenshotTesting E2E Tests', () => {
   beforeAll(() => {
     // Global setup
   });

@@ -3,9 +3,12 @@ Pandas Data Cleaning Snippets
 Production-ready examples for cleaning and preparing data
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Optional, Union
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import List, Optional, Union
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def remove_duplicates(df: pd.DataFrame, subset: Optional[List[str]] = None) -> pd.DataFrame:
@@ -46,12 +49,12 @@ def fill_missing_with_mode(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame
 
 def forward_fill_missing(df: pd.DataFrame) -> pd.DataFrame:
     """Forward fill missing values (carry last valid observation forward)"""
-    return df.fillna(method='ffill')
+    return df.ffill()
 
 
 def backward_fill_missing(df: pd.DataFrame) -> pd.DataFrame:
     """Backward fill missing values"""
-    return df.fillna(method='bfill')
+    return df.bfill()
 
 
 def interpolate_missing(df: pd.DataFrame, method: str = 'linear') -> pd.DataFrame:
@@ -144,5 +147,46 @@ def reset_index_clean(df: pd.DataFrame) -> pd.DataFrame:
 def clean_currency_column(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Clean currency column (remove $, commas, etc.)"""
     df = df.copy()
-    df[column] = df[column].str.replace('$', '').str.replace(',', '').astype(float)
+    df[column] = df[column].str.replace('$', '', regex=False).str.replace(',', '', regex=False).astype(float)
     return df
+
+
+# Example usage with synthetic data
+if __name__ == "__main__":
+    # Create sample data with missing values and outliers
+    np.random.seed(42)
+    sample_data = pd.DataFrame({
+        'id': range(1, 101),
+        'age': np.random.randint(18, 80, 100),
+        'salary': np.random.randint(30000, 150000, 100),
+        'category': np.random.choice(['A', 'B', 'C', None], 100),
+        'score': np.random.randn(100) * 10 + 50
+    })
+
+    # Add some missing values
+    sample_data.loc[np.random.choice(100, 10, replace=False), 'age'] = np.nan
+    sample_data.loc[np.random.choice(100, 15, replace=False), 'salary'] = np.nan
+
+    # Add outliers
+    sample_data.loc[5, 'salary'] = 1000000
+    sample_data.loc[10, 'score'] = 200
+
+    print("Testing data cleaning functions:")
+    print("\nOriginal data:")
+    print(sample_data.head(20))
+    print(f"\nMissing values:\n{sample_data.isnull().sum()}")
+
+    # Test removing duplicates
+    print("\n--- Testing remove_duplicates ---")
+    cleaned = remove_duplicates(sample_data)
+    print(f"Shape after removing duplicates: {cleaned.shape}")
+
+    # Test filling missing values
+    print("\n--- Testing fill_missing_with_median ---")
+    filled = fill_missing_with_median(sample_data, ['age', 'salary'])
+    print(f"Missing values after median fill:\n{filled[['age', 'salary']].isnull().sum()}")
+
+    # Test outlier removal
+    print("\n--- Testing remove_outliers_iqr ---")
+    no_outliers = remove_outliers_iqr(sample_data.copy(), 'salary')
+    print(f"Shape after removing outliers: {no_outliers.shape}")

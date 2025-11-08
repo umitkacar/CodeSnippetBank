@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// MicroservicesCommunication Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('MicroservicesCommunication Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

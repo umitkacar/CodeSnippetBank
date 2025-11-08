@@ -4,6 +4,7 @@ High-level symmetric encryption using Fernet
 """
 from cryptography.fernet import Fernet
 import base64
+import time
 
 
 class FernetEncryption:
@@ -39,8 +40,6 @@ class FernetEncryption:
 
 # Example
 if __name__ == "__main__":
-    import time
-    
     fernet = FernetEncryption()
     plaintext = b"Secret message"
     

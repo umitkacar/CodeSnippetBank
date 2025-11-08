@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 import secrets
 
@@ -82,13 +82,13 @@ def create_access_token(
     """Create JWT access token"""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({
         "exp": expire,
-        "iat": datetime.utcnow(),
+        "iat": datetime.now(timezone.utc),
         "type": "access"
     })
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -99,8 +99,8 @@ def create_refresh_token(user_id: str) -> str:
     token = secrets.token_urlsafe(32)
     refresh_tokens_db[token] = {
         "user_id": user_id,
-        "created_at": datetime.utcnow(),
-        "expires_at": datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        "created_at": datetime.now(timezone.utc),
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     }
     return token
 
@@ -127,7 +127,7 @@ def verify_refresh_token(token: str) -> Optional[str]:
         return None
 
     token_data = refresh_tokens_db[token]
-    if datetime.utcnow() > token_data["expires_at"]:
+    if datetime.now(timezone.utc) > token_data["expires_at"]:
         del refresh_tokens_db[token]
         return None
 
@@ -184,7 +184,7 @@ async def authorize(
         "user_id": user_id,
         "redirect_uri": redirect_uri,
         "scope": scope,
-        "expires_at": datetime.utcnow() + timedelta(minutes=10)
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=10)
     }
 
     return {
@@ -216,7 +216,7 @@ async def get_token(
         code_data = authorization_codes[code]
 
         # Verify expiration
-        if datetime.utcnow() > code_data["expires_at"]:
+        if datetime.now(timezone.utc) > code_data["expires_at"]:
             del authorization_codes[code]
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

@@ -3,11 +3,17 @@ OCR with Tesseract and EasyOCR
 Text extraction from images using multiple OCR engines.
 """
 
-import cv2
-import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from pathlib import Path
+
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    import numpy as np
 
 try:
     import pytesseract
@@ -58,8 +64,10 @@ class TesseractOCR:
             psm: Page segmentation mode (0-13)
             oem: OCR engine mode (0-3)
         """
+        if not CV2_AVAILABLE:
+            raise ImportError("opencv-python not installed. Install with: pip install opencv-python")
         if not TESSERACT_AVAILABLE:
-            raise ImportError("pytesseract not installed")
+            raise ImportError("pytesseract not installed. Install with: pip install pytesseract")
 
         self.lang = lang
         self.config = f"--psm {psm} --oem {oem}"
@@ -177,8 +185,10 @@ class EasyOCRWrapper:
             languages: List of language codes
             gpu: Whether to use GPU
         """
+        if not CV2_AVAILABLE:
+            raise ImportError("opencv-python not installed. Install with: pip install opencv-python")
         if not EASYOCR_AVAILABLE:
-            raise ImportError("easyocr not installed")
+            raise ImportError("easyocr not installed. Install with: pip install easyocr")
 
         if languages is None:
             languages = ['en']
@@ -407,6 +417,11 @@ class OCRPostProcessor:
 
 # Usage Examples
 if __name__ == "__main__":
+    if not CV2_AVAILABLE:
+        print("Error: opencv-python not installed")
+        print("Install with: pip install opencv-python")
+        exit(1)
+
     # Example 1: Tesseract OCR
     if TESSERACT_AVAILABLE:
         print("=== Tesseract OCR ===")

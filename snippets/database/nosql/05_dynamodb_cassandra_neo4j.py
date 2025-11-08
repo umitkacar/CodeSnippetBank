@@ -11,11 +11,12 @@ DynamoDB, Cassandra, and Neo4j Operations
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from decimal import Decimal
+from typing import Dict, Any, List, Optional
 
 dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
 # Snippet 1: Put item in DynamoDB
-def create_user(user_id, user_data):
+def create_user(user_id: str, user_data: Dict[str, Any]) -> Dict[str, Any]:
     table = dynamodb.Table('Users')
 
     response = table.put_item(
@@ -31,7 +32,7 @@ def create_user(user_id, user_data):
     return response
 
 # Snippet 2: Get item from DynamoDB
-def get_user(user_id):
+def get_user(user_id: str) -> Optional[Dict[str, Any]]:
     table = dynamodb.Table('Users')
 
     response = table.get_item(
@@ -41,7 +42,7 @@ def get_user(user_id):
     return response.get('Item')
 
 # Snippet 3: Query with partition key and sort key
-def get_user_orders(user_id, start_date=None):
+def get_user_orders(user_id: str, start_date: Optional[str] = None) -> List[Dict[str, Any]]:
     table = dynamodb.Table('Orders')
 
     key_condition = Key('userId').eq(user_id)
@@ -58,7 +59,7 @@ def get_user_orders(user_id, start_date=None):
     return response['Items']
 
 # Snippet 4: Query with GSI (Global Secondary Index)
-def get_orders_by_status(status, limit=100):
+def get_orders_by_status(status: str, limit: int = 100) -> List[Dict[str, Any]]:
     table = dynamodb.Table('Orders')
 
     response = table.query(
@@ -70,7 +71,7 @@ def get_orders_by_status(status, limit=100):
     return response['Items']
 
 # Snippet 5: Scan with filter
-def scan_high_value_customers(min_lifetime_value):
+def scan_high_value_customers(min_lifetime_value: float) -> List[Dict[str, Any]]:
     table = dynamodb.Table('Users')
 
     response = table.scan(
@@ -80,7 +81,7 @@ def scan_high_value_customers(min_lifetime_value):
     return response['Items']
 
 # Snippet 6: Update item
-def update_user_email(user_id, new_email):
+def update_user_email(user_id: str, new_email: str) -> Dict[str, Any]:
     table = dynamodb.Table('Users')
 
     response = table.update_item(
@@ -96,7 +97,7 @@ def update_user_email(user_id, new_email):
     return response['Attributes']
 
 # Snippet 7: Atomic counter
-def increment_page_views(page_id):
+def increment_page_views(page_id: str) -> int:
     table = dynamodb.Table('Pages')
 
     response = table.update_item(
@@ -109,7 +110,7 @@ def increment_page_views(page_id):
     return response['Attributes']['viewCount']
 
 # Snippet 8: Conditional update
-def update_order_status(order_id, new_status, expected_current_status):
+def update_order_status(order_id: str, new_status: str, expected_current_status: str) -> Optional[Dict[str, Any]]:
     table = dynamodb.Table('Orders')
 
     try:
@@ -129,7 +130,7 @@ def update_order_status(order_id, new_status, expected_current_status):
         return None
 
 # Snippet 9: Batch write
-def batch_create_users(users):
+def batch_create_users(users: List[Dict[str, Any]]) -> None:
     table = dynamodb.Table('Users')
 
     with table.batch_writer() as batch:
@@ -137,7 +138,7 @@ def batch_create_users(users):
             batch.put_item(Item=user)
 
 # Snippet 10: Transaction write
-def transfer_points(from_user_id, to_user_id, points):
+def transfer_points(from_user_id: str, to_user_id: str, points: int) -> Dict[str, Any]:
     client = boto3.client('dynamodb')
 
     response = client.transact_write_items(
@@ -181,7 +182,7 @@ cluster = Cluster(['127.0.0.1'])
 session = cluster.connect('myapp')
 
 # Snippet 11: Insert with TTL
-def create_session(session_id, user_id, ttl_seconds=3600):
+def create_session(session_id: str, user_id: str, ttl_seconds: int = 3600) -> None:
     query = """
         INSERT INTO user_sessions (session_id, user_id, created_at)
         VALUES (?, ?, ?)
@@ -191,7 +192,7 @@ def create_session(session_id, user_id, ttl_seconds=3600):
     session.execute(query, (session_id, user_id, datetime.now(), ttl_seconds))
 
 # Snippet 12: Query with clustering key
-def get_user_events(user_id, start_time=None, end_time=None):
+def get_user_events(user_id: str, start_time: Optional[Any] = None, end_time: Optional[Any] = None) -> List[Any]:
     query = """
         SELECT * FROM user_events
         WHERE user_id = ?
@@ -208,7 +209,7 @@ def get_user_events(user_id, start_time=None, end_time=None):
     return list(rows)
 
 # Snippet 13: Counter table
-def increment_view_count(page_id):
+def increment_view_count(page_id: str) -> None:
     query = """
         UPDATE page_views
         SET view_count = view_count + 1
@@ -218,7 +219,7 @@ def increment_view_count(page_id):
     session.execute(query, (page_id,))
 
 # Snippet 14: Batch insert
-def batch_insert_events(events):
+def batch_insert_events(events: List[Dict[str, Any]]) -> None:
     batch = BatchStatement()
 
     query = """
@@ -237,7 +238,7 @@ def batch_insert_events(events):
     session.execute(batch)
 
 # Snippet 15: Time series query with bucketing
-def get_metrics_for_day(metric_name, date):
+def get_metrics_for_day(metric_name: str, date: Any) -> List[Any]:
     query = """
         SELECT bucket_time, metric_value
         FROM time_series_metrics
@@ -249,7 +250,7 @@ def get_metrics_for_day(metric_name, date):
     return list(rows)
 
 # Snippet 16: Lightweight transaction (Compare-And-Set)
-def create_user_if_not_exists(user_id, email, name):
+def create_user_if_not_exists(user_id: str, email: str, name: str) -> bool:
     query = """
         INSERT INTO users (user_id, email, name, created_at)
         VALUES (?, ?, ?, ?)
@@ -260,7 +261,7 @@ def create_user_if_not_exists(user_id, email, name):
     return result.was_applied
 
 # Snippet 17: Collection operations
-def add_tag_to_product(product_id, tag):
+def add_tag_to_product(product_id: str, tag: str) -> None:
     query = """
         UPDATE products
         SET tags = tags + ?
@@ -269,7 +270,7 @@ def add_tag_to_product(product_id, tag):
 
     session.execute(query, ({tag}, product_id))
 
-def remove_tag_from_product(product_id, tag):
+def remove_tag_from_product(product_id: str, tag: str) -> None:
     query = """
         UPDATE products
         SET tags = tags - ?
@@ -291,7 +292,7 @@ neo4j_driver = GraphDatabase.driver(
 )
 
 # Snippet 18: Create nodes and relationships
-def create_user_follows_relationship(follower_id, followee_id):
+def create_user_follows_relationship(follower_id: str, followee_id: str) -> Any:
     with neo4j_driver.session() as session:
         result = session.run("""
             MATCH (follower:User {userId: $follower_id})
@@ -303,7 +304,7 @@ def create_user_follows_relationship(follower_id, followee_id):
         return result.single()
 
 # Snippet 19: Find friends of friends
-def get_friends_of_friends(user_id, max_depth=2):
+def get_friends_of_friends(user_id: str, max_depth: int = 2) -> List[Dict[str, Any]]:
     with neo4j_driver.session() as session:
         result = session.run("""
             MATCH (user:User {userId: $user_id})-[:FOLLOWS*1..2]-(friend)
@@ -315,7 +316,7 @@ def get_friends_of_friends(user_id, max_depth=2):
         return [dict(record) for record in result]
 
 # Snippet 20: Recommendation based on graph
-def get_product_recommendations(user_id, limit=10):
+def get_product_recommendations(user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
     with neo4j_driver.session() as session:
         result = session.run("""
             MATCH (user:User {userId: $user_id})-[:PURCHASED]->(p:Product)
@@ -332,7 +333,7 @@ def get_product_recommendations(user_id, limit=10):
         return [dict(record) for record in result]
 
 # Snippet 21: Shortest path between nodes
-def find_connection_path(user_id1, user_id2):
+def find_connection_path(user_id1: str, user_id2: str) -> Any:
     with neo4j_driver.session() as session:
         result = session.run("""
             MATCH path = shortestPath(
@@ -345,7 +346,7 @@ def find_connection_path(user_id1, user_id2):
         return result.single()
 
 # Snippet 22: Community detection with PageRank
-def get_influential_users(limit=20):
+def get_influential_users(limit: int = 20) -> List[Dict[str, Any]]:
     with neo4j_driver.session() as session:
         result = session.run("""
             CALL gds.pageRank.stream('userGraph')
@@ -360,7 +361,7 @@ def get_influential_users(limit=20):
         return [dict(record) for record in result]
 
 # Snippet 23: Create full-text index and search
-def search_users_by_name(search_term):
+def search_users_by_name(search_term: str) -> List[Dict[str, Any]]:
     with neo4j_driver.session() as session:
         result = session.run("""
             CALL db.index.fulltext.queryNodes('userNameIndex', $search_term)
@@ -375,7 +376,7 @@ def search_users_by_name(search_term):
         return [dict(record) for record in result]
 
 # Snippet 24: Aggregate relationship properties
-def get_user_interaction_stats(user_id):
+def get_user_interaction_stats(user_id: str) -> List[Dict[str, Any]]:
     with neo4j_driver.session() as session:
         result = session.run("""
             MATCH (user:User {userId: $user_id})-[r:INTERACTED_WITH]->(other:User)

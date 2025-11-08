@@ -4,7 +4,9 @@ Production-ready digital signature implementations
 """
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, padding
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
 from cryptography.exceptions import InvalidSignature
+from typing import Union
 
 
 class DigitalSignatures:

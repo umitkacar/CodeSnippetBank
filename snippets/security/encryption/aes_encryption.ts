@@ -1,6 +1,8 @@
 /**
  * AES Encryption (TypeScript)
  * Production-ready AES encryption with multiple modes
+ *
+ * Install dependencies: npm install --save-dev @types/node
  */
 import * as crypto from 'crypto';
 

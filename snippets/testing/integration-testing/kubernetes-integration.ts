@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// KubernetesIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('KubernetesIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

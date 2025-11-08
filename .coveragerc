@@ -1,0 +1,157 @@
+# =============================================================================
+# Coverage.py Configuration
+# =============================================================================
+# This file provides coverage configuration for tools that prefer .coveragerc
+# The primary configuration is in pyproject.toml [tool.coverage.*]
+# See: https://coverage.readthedocs.io/
+
+[run]
+# Source code directories to measure
+source = .
+
+# Files and directories to omit from coverage
+omit =
+    tests/*
+    setup.py
+    */__pycache__/*
+    */.venv/*
+    */venv/*
+    */env/*
+    */build/*
+    */dist/*
+    */.pytest_cache/*
+    */.mypy_cache/*
+    */.ruff_cache/*
+    */.tox/*
+    */migrations/*
+    */__init__.py
+    */site-packages/*
+
+# Measure branch coverage in addition to statement coverage
+branch = True
+
+# Run coverage in parallel mode (useful with pytest-xdist)
+parallel = True
+
+# Enable dynamic context tracking
+dynamic_context = test_function
+
+# Concurrency detection (multiprocessing, thread, greenlet, eventlet, gevent)
+# concurrency = multiprocessing
+
+[report]
+# Precision for coverage percentage reporting
+precision = 2
+
+# Show missing lines in the report
+show_missing = True
+
+# Don't show files with 100% coverage
+skip_covered = False
+
+# Don't show files with no executable code
+skip_empty = True
+
+# Sort the report by coverage percentage
+sort = Cover
+
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    def __str__
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+
+    # Don't complain about type checking code
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+
+    # Don't complain about abstract methods
+    @(abc\.)?abstractmethod
+    @abstractmethod
+
+    # Don't complain about protocol methods
+    class .*\bProtocol\):
+    @runtime_checkable
+
+    # Don't complain about overload signatures
+    @overload
+
+    # Don't complain about ellipsis in stubs
+    \.\.\.
+
+# Additional patterns to exclude
+ignore_errors = True
+
+# Fail if coverage is below this percentage
+fail_under = 80
+
+[html]
+# Directory for HTML coverage report
+directory = htmlcov
+
+# Title for the HTML report
+title = CodeSnippetBank Coverage Report
+
+# Show contexts in the HTML report
+show_contexts = True
+
+[xml]
+# Output file for XML coverage report
+output = coverage.xml
+
+[json]
+# Output file for JSON coverage report
+output = coverage.json
+
+# Pretty print the JSON report
+pretty_print = True
+
+# Show contexts in the JSON report
+show_contexts = True
+
+[paths]
+# Source path aliases for combining coverage from different environments
+source =
+    .
+    */site-packages/
+
+[coverage:run]
+# Additional source packages to measure (if running as installed package)
+# source_pkgs =
+#     codebank
+#     ai
+#     api
+#     converters
+#     core
+#     framework
+#     tissues
+#     tools
+
+# Plugins to load
+plugins =
+    # coverage_conditional_plugin
+
+# Data file location
+data_file = .coverage
+
+# Enable/disable warnings
+disable_warnings =
+    # no-data-collected
+    # module-not-imported
+
+[coverage:paths]
+# Map paths for combining coverage from different locations
+source =
+    .
+    /home/user/CodeSnippetBank
+    */CodeSnippetBank

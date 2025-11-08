@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// PaymentGatewayIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('PaymentGatewayIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

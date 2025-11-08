@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// OauthAuthentication Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('OauthAuthentication Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -27,7 +27,7 @@ products = [
         category=["Electronics", "Books", "Clothing", "Home"][i % 4],
         tags=["sale", "new", "featured"][:i % 3],
         in_stock=i % 2 == 0,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     for i in range(1, 51)
 ]

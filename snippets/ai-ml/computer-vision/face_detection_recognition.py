@@ -3,10 +3,16 @@ Face Detection and Recognition
 Face detection, recognition, and analysis using multiple methods.
 """
 
-import cv2
-import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
+
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    import numpy as np
 
 try:
     import face_recognition

@@ -46,7 +46,10 @@ def train_gradient_boosting(X_train, y_train):
 
 def train_xgboost_classifier(X_train, y_train):
     """Train XGBoost classifier"""
-    from xgboost import XGBClassifier
+    try:
+        from xgboost import XGBClassifier
+    except ImportError:
+        raise ImportError("xgboost not installed. Install with: pip install xgboost")
 
     model = XGBClassifier(n_estimators=100, learning_rate=0.1, random_state=42)
     model.fit(X_train, y_train)
@@ -55,7 +58,10 @@ def train_xgboost_classifier(X_train, y_train):
 
 def train_xgboost_regressor(X_train, y_train):
     """Train XGBoost regressor"""
-    from xgboost import XGBRegressor
+    try:
+        from xgboost import XGBRegressor
+    except ImportError:
+        raise ImportError("xgboost not installed. Install with: pip install xgboost")
 
     model = XGBRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
     model.fit(X_train, y_train)
@@ -64,9 +70,12 @@ def train_xgboost_regressor(X_train, y_train):
 
 def train_lightgbm_classifier(X_train, y_train):
     """Train LightGBM classifier"""
-    from lightgbm import LGBMClassifier
+    try:
+        from lightgbm import LGBMClassifier
+    except ImportError:
+        raise ImportError("lightgbm not installed. Install with: pip install lightgbm")
 
-    model = LGBMClassifier(n_estimators=100, learning_rate=0.1, random_state=42)
+    model = LGBMClassifier(n_estimators=100, learning_rate=0.1, random_state=42, verbose=-1)
     model.fit(X_train, y_train)
     return model
 
@@ -158,7 +167,10 @@ def train_neural_network_sklearn(X_train, y_train):
 
 def train_catboost_classifier(X_train, y_train):
     """Train CatBoost classifier"""
-    from catboost import CatBoostClassifier
+    try:
+        from catboost import CatBoostClassifier
+    except ImportError:
+        raise ImportError("catboost not installed. Install with: pip install catboost")
 
     model = CatBoostClassifier(iterations=100, learning_rate=0.1,
                                 random_state=42, verbose=False)

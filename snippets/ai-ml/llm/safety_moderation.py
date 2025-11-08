@@ -4,6 +4,7 @@ Content moderation and safety checks for LLM inputs/outputs.
 """
 
 import re
+import os
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
@@ -109,11 +110,13 @@ class OpenAIModerationClient:
 
         Args:
             api_key: OpenAI API key
+
+        Raises:
+            ImportError: If openai package not installed
         """
         if not OPENAI_AVAILABLE:
-            raise ImportError("openai not installed")
+            raise ImportError("openai not installed. Install with: pip install openai")
 
-        import os
         api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(api_key=api_key)
 

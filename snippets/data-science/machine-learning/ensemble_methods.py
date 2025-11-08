@@ -44,7 +44,7 @@ def bagging_classifier(X_train, y_train, n_estimators=100):
     """Create bagging classifier"""
     base_clf = DecisionTreeClassifier(random_state=42)
     bagging_clf = BaggingClassifier(
-        base_estimator=base_clf,
+        estimator=base_clf,
         n_estimators=n_estimators,
         max_samples=0.8,
         max_features=0.8,
@@ -70,7 +70,7 @@ def random_forest_ensemble(X_train, y_train, n_estimators=100):
 def adaboost_classifier(X_train, y_train, n_estimators=50):
     """Create AdaBoost classifier (sequential boosting)"""
     ada_clf = AdaBoostClassifier(
-        base_estimator=DecisionTreeClassifier(max_depth=1),
+        estimator=DecisionTreeClassifier(max_depth=1),
         n_estimators=n_estimators,
         learning_rate=1.0,
         random_state=42

@@ -3,7 +3,7 @@ Multi-Model Routing
 Intelligently route requests to different LLMs based on requirements.
 """
 
-from typing import List, Dict, Any, Optional, Callable
+from typing import List, Dict, Any, Optional, Callable, Tuple
 from dataclasses import dataclass
 from enum import Enum
 import re

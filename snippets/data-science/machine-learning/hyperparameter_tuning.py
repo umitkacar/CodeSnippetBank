@@ -84,7 +84,11 @@ def svm_param_grid():
 
 def bayesian_optimization():
     """Perform Bayesian optimization for hyperparameter tuning"""
-    from skopt import BayesSearchCV
+    try:
+        from skopt import BayesSearchCV
+    except ImportError:
+        raise ImportError("scikit-optimize not installed. Install with: pip install scikit-optimize")
+
     from sklearn.ensemble import RandomForestClassifier
 
     param_space = {
@@ -107,7 +111,11 @@ def bayesian_optimization():
 
 def optuna_optimization(X_train, y_train):
     """Hyperparameter optimization using Optuna"""
-    import optuna
+    try:
+        import optuna
+    except ImportError:
+        raise ImportError("optuna not installed. Install with: pip install optuna")
+
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import cross_val_score
 
@@ -125,16 +133,19 @@ def optuna_optimization(X_train, y_train):
         return score
 
     study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=100, show_progress_bar=False)
 
     return study.best_params, study.best_value
 
 
 def halving_grid_search():
     """Successive Halving for faster hyperparameter search"""
-    from sklearn.experimental import enable_halving_search_cv
-    from sklearn.model_selection import HalvingGridSearchCV
-    from sklearn.ensemble import RandomForestClassifier
+    try:
+        from sklearn.experimental import enable_halving_search_cv  # noqa
+        from sklearn.model_selection import HalvingGridSearchCV
+        from sklearn.ensemble import RandomForestClassifier
+    except ImportError:
+        raise ImportError("HalvingGridSearchCV requires scikit-learn >= 0.24")
 
     param_grid = {
         'n_estimators': [50, 100, 200, 300],

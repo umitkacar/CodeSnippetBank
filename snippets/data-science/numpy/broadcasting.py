@@ -3,7 +3,10 @@ NumPy Broadcasting Snippets
 Production-ready examples for broadcasting operations
 """
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def add_scalar_to_array(arr: np.ndarray, scalar: float) -> np.ndarray:

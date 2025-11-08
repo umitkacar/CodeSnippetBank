@@ -5,6 +5,7 @@ Production-ready session handling with Redis backend
 import secrets
 import json
 import hashlib
+import hmac
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import redis
@@ -293,8 +294,6 @@ class SecureCookieSession:
 
 # Example usage
 if __name__ == "__main__":
-    import hmac
-
     # Initialize Redis client
     redis_client = redis.Redis(
         host='localhost',

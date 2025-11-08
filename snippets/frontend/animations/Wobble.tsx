@@ -1,10 +1,17 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface WobbleProps {
+  children: ReactNode;
+}
+
+export const Wobble = ({ children }: WobbleProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{
+      rotate: [0, -5, 5, -5, 5, 0],
+      x: [0, -25, 25, -25, 25, 0]
+    }}
+    transition={{ duration: 0.8 }}
   >
     {children}
   </motion.div>

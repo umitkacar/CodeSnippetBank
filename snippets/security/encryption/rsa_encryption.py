@@ -5,7 +5,7 @@ Production-ready RSA asymmetric encryption
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.backends import default_backend
-from typing import Tuple
+from typing import Tuple, Optional
 import base64
 
 
@@ -80,7 +80,7 @@ class RSAEncryption:
             return False
 
     @staticmethod
-    def save_private_key(private_key: rsa.RSAPrivateKey, filename: str, password: bytes = None):
+    def save_private_key(private_key: rsa.RSAPrivateKey, filename: str, password: Optional[bytes] = None) -> None:
         """Save private key to file"""
         encryption = serialization.BestAvailableEncryption(password) if password else serialization.NoEncryption()
         pem = private_key.private_bytes(
@@ -92,7 +92,7 @@ class RSAEncryption:
             f.write(pem)
 
     @staticmethod
-    def save_public_key(public_key: rsa.RSAPublicKey, filename: str):
+    def save_public_key(public_key: rsa.RSAPublicKey, filename: str) -> None:
         """Save public key to file"""
         pem = public_key.public_bytes(
             encoding=serialization.Encoding.PEM,
@@ -102,7 +102,7 @@ class RSAEncryption:
             f.write(pem)
 
     @staticmethod
-    def load_private_key(filename: str, password: bytes = None) -> rsa.RSAPrivateKey:
+    def load_private_key(filename: str, password: Optional[bytes] = None) -> rsa.RSAPrivateKey:
         """Load private key from file"""
         with open(filename, 'rb') as f:
             private_key = serialization.load_pem_private_key(
@@ -110,7 +110,7 @@ class RSAEncryption:
                 password=password,
                 backend=default_backend()
             )
-        return private_key
+        return private_key  # type: ignore
 
     @staticmethod
     def load_public_key(filename: str) -> rsa.RSAPublicKey:
@@ -120,7 +120,7 @@ class RSAEncryption:
                 f.read(),
                 backend=default_backend()
             )
-        return public_key
+        return public_key  # type: ignore
 
 
 # Example usage

@@ -1,5 +1,5 @@
 import React from 'react';
-import { VirtualizedList, View, Text, StyleSheet } from 'react-native';
+import { VirtualizedList, View, Text, StyleSheet, Dimensions } from 'react-native';
 
 interface Item {
   id: string;
@@ -38,6 +38,7 @@ export const OptimizedVirtualizedList: React.FC<VirtualizedListProps> = ({ data 
 
 // FlashList - more performant alternative
 import { FlashList } from '@shopify/flash-list';
+import { LayoutProvider, RecyclerListView as RLV, DataProvider } from 'recyclerlistview';
 
 export const HighPerformanceList: React.FC<{ data: Item[] }> = ({ data }) => {
   return (
@@ -73,7 +74,7 @@ export const RecyclerListView: React.FC<{ data: any[] }> = ({ data }) => {
   };
 
   return (
-    <RecyclerListView
+    <RLV
       layoutProvider={layoutProvider}
       dataProvider={new DataProvider((r1, r2) => r1 !== r2).cloneWithRows(data)}
       rowRenderer={rowRenderer}

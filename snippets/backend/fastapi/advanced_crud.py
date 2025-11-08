@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 app = FastAPI()
@@ -49,7 +49,7 @@ async def create_author(author: AuthorCreate):
     new_author = Author(
         id=author_id,
         **author.model_dump(),
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
         books_count=0
     )
     authors_db[author_id] = new_author
@@ -92,7 +92,7 @@ async def create_book(book: BookCreate):
     new_book = Book(
         id=book_id,
         **book.model_dump(),
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     books_db[book_id] = new_book
 

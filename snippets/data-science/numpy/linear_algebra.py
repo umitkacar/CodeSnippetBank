@@ -3,8 +3,11 @@ NumPy Linear Algebra Snippets
 Production-ready examples for linear algebra operations
 """
 
-import numpy as np
-from typing import Tuple
+try:
+    import numpy as np
+    from typing import Tuple
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def matrix_multiplication(A: np.ndarray, B: np.ndarray) -> np.ndarray:
@@ -138,7 +141,11 @@ def kronecker_product(A: np.ndarray, B: np.ndarray) -> np.ndarray:
 
 def matrix_exponential(A: np.ndarray) -> np.ndarray:
     """Calculate matrix exponential"""
-    from scipy.linalg import expm
+    try:
+        from scipy.linalg import expm
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
     return expm(A)
 
 

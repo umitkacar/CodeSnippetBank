@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type RootStackParamList = {
   Auth: undefined;
@@ -100,11 +101,11 @@ export const useAuth = () => {
 // Protected route component
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      navigation.navigate('Auth');
+      navigation.navigate('Auth' as never);
     }
   }, [isAuthenticated, navigation]);
 
@@ -115,3 +116,10 @@ async function checkAuthStatus(): Promise<boolean> {
   const token = await AsyncStorage.getItem('auth_token');
   return token !== null;
 }
+
+// Placeholder components for demonstration
+const LoginScreen = () => null;
+const RegisterScreen = () => null;
+const ForgotPasswordScreen = () => null;
+const SplashScreen = () => null;
+const MainNavigator = () => null;
