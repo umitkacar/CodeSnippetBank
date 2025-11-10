@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from typing import Dict, Optional, List
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 import asyncio
 from uuid import uuid4, UUID
 
@@ -70,7 +70,7 @@ async def worker():
             if task:
                 # Update status
                 task.status = TaskStatus.PROCESSING
-                task.updated_at = datetime.utcnow()
+                task.updated_at = datetime.now(timezone.utc)
 
                 # Process task
                 try:
@@ -81,7 +81,7 @@ async def worker():
                     task.status = TaskStatus.FAILED
                     task.error = str(e)
 
-                task.updated_at = datetime.utcnow()
+                task.updated_at = datetime.now(timezone.utc)
 
             task_queue.task_done()
 
@@ -105,8 +105,8 @@ async def create_task(task_create: TaskCreate):
         type=task_create.type,
         status=TaskStatus.PENDING,
         data=task_create.data,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
 
     tasks_db[task_id] = task

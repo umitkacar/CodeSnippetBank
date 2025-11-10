@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Callable, List, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -25,7 +25,7 @@ class EventBus:
 
     async def publish(self, event: Event):
         """Publish event"""
-        event.timestamp = datetime.utcnow()
+        event.timestamp = datetime.now(timezone.utc)
         if event.type in self.subscribers:
             for handler in self.subscribers[event.type]:
                 await handler(event)

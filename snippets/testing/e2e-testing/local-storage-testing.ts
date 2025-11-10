@@ -1,7 +1,7 @@
-// ${file} E2E Testing
+// LocalStorageTesting E2E Testing
 // Production-ready end-to-end testing patterns
 
-describe('${file} E2E Tests', () => {
+describe('LocalStorageTesting E2E Tests', () => {
   beforeAll(() => {
     // Global setup
   });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { View, Text, StyleSheet, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type DrawerParamList = {
   Home: undefined;
@@ -112,3 +113,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+// Placeholder components for demonstration
+const HomeScreen = () => null;
+const ProfileScreen = () => null;
+const SettingsScreen = () => null;

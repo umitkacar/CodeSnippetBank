@@ -1,11 +1,32 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface StaggeredFadeInProps {
+  children: ReactNode[];
+}
+
+export const StaggeredFadeIn = ({ children }: StaggeredFadeInProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    initial="hidden"
+    animate="visible"
+    variants={{
+      visible: {
+        transition: {
+          staggerChildren: 0.1,
+        },
+      },
+    }}
   >
-    {children}
+    {children.map((child, index) => (
+      <motion.div
+        key={index}
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0 },
+        }}
+      >
+        {child}
+      </motion.div>
+    ))}
   </motion.div>
 );

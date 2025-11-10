@@ -1,5 +1,15 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export function ${file}({ children, ...props }: any) {
-  return <div {...props}>{children}</div>;
+interface ScrollAreaProps {
+  children: ReactNode;
+  height?: string;
 }
+
+export const ScrollArea = ({ children, height = '400px' }: ScrollAreaProps) => (
+  <div
+    className="overflow-auto"
+    style={{ height }}
+  >
+    {children}
+  </div>
+);

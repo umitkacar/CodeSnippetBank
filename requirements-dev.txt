@@ -1,0 +1,159 @@
+# =============================================================================
+# Development Dependencies for CodeSnippetBank
+# =============================================================================
+# Install with: pip install -r requirements-dev.txt
+# Or install the dev extras: pip install -e ".[dev]"
+
+# -----------------------------------------------------------------------------
+# Code Quality Tools
+# -----------------------------------------------------------------------------
+
+# Ruff - Modern Python linter and formatter (replaces black, flake8, isort)
+ruff>=0.8.0
+
+# Mypy - Static type checking
+mypy>=1.13.0
+
+# Type stubs for third-party libraries
+types-Pillow>=10.0.0
+
+# Bandit - Security linter
+bandit[toml]>=1.7.10
+
+# Pydocstyle - Docstring style checker
+pydocstyle>=6.3.0
+
+# -----------------------------------------------------------------------------
+# Testing Tools
+# -----------------------------------------------------------------------------
+
+# Pytest - Testing framework
+pytest>=8.3.0
+
+# Pytest plugins
+pytest-cov>=6.0.0           # Coverage plugin
+pytest-asyncio>=0.24.0      # Async test support
+pytest-xdist>=3.6.0         # Parallel test execution
+pytest-timeout>=2.3.0       # Test timeout support
+pytest-mock>=3.14.0         # Mock/patch support
+pytest-benchmark>=5.1.0     # Performance benchmarking
+
+# Coverage tools
+coverage[toml]>=7.6.0
+
+# -----------------------------------------------------------------------------
+# Build and Package Management
+# -----------------------------------------------------------------------------
+
+# Hatch - Modern Python project manager
+hatch>=1.13.0
+
+# Build - PEP 517 build frontend
+build>=1.2.0
+
+# Twine - Upload packages to PyPI
+twine>=6.0.0
+
+# -----------------------------------------------------------------------------
+# Git Hooks and Pre-commit
+# -----------------------------------------------------------------------------
+
+# Pre-commit - Git hook framework
+pre-commit>=4.0.0
+
+# Conventional commits helper
+conventional-pre-commit>=3.6.0
+
+# -----------------------------------------------------------------------------
+# Documentation Tools
+# -----------------------------------------------------------------------------
+
+# Sphinx - Documentation generator
+sphinx>=8.1.0
+sphinx-rtd-theme>=3.0.0
+sphinx-autodoc-typehints>=2.5.0
+
+# MkDocs - Modern documentation with Material theme
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
+mkdocstrings[python]>=0.26.0
+
+# -----------------------------------------------------------------------------
+# Development Utilities
+# -----------------------------------------------------------------------------
+
+# IPython - Enhanced interactive Python shell
+ipython>=8.29.0
+
+# Jupyter - Interactive notebooks
+jupyter>=1.1.0
+notebook>=7.3.0
+jupyterlab>=4.3.0
+
+# Rich - Beautiful terminal output
+rich>=13.9.0
+
+# Typer - Modern CLI framework
+typer[all]>=0.15.0
+
+# Pydantic - Data validation
+pydantic>=2.10.0
+
+# -----------------------------------------------------------------------------
+# Debugging and Profiling
+# -----------------------------------------------------------------------------
+
+# IPdb - IPython debugger
+ipdb>=0.13.13
+
+# Py-spy - Sampling profiler
+py-spy>=0.3.14
+
+# Memory profiler
+memory-profiler>=0.61.0
+
+# -----------------------------------------------------------------------------
+# Additional Development Tools
+# -----------------------------------------------------------------------------
+
+# Watchdog - File system event monitoring (for auto-reload)
+watchdog>=6.0.0
+
+# Python-dotenv - Environment variable management
+python-dotenv>=1.0.0
+
+# Requests - HTTP library (for testing APIs)
+requests>=2.32.0
+
+# Faker - Generate fake data for testing
+faker>=33.0.0
+
+# Freezegun - Time mocking for tests
+freezegun>=1.5.0
+
+# Responses - Mock HTTP requests
+responses>=0.25.0
+
+# -----------------------------------------------------------------------------
+# Code Analysis and Metrics
+# -----------------------------------------------------------------------------
+
+# Radon - Code complexity analysis
+radon>=6.0.1
+
+# Vulture - Find dead code
+vulture>=2.13
+
+# Interrogate - Check documentation coverage
+interrogate>=1.7.0
+
+# -----------------------------------------------------------------------------
+# Notes
+# -----------------------------------------------------------------------------
+# For production dependencies, see pyproject.toml [project.dependencies]
+# For edge AI dependencies, install with: pip install -e ".[edge]"
+#
+# Recommended installation:
+#   pip install -e ".[dev]"
+#
+# This installs the package in editable mode with all dev dependencies.

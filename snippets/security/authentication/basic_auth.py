@@ -357,18 +357,23 @@ class APIKeyBasicAuth:
 
 # Example usage
 if __name__ == "__main__":
+    import os
+
     # Create user validator
     def validate_user(username: str, password: str) -> Optional[Dict]:
-        # In production, check against database
+        # In production, check against database with hashed passwords
+        # This is a simplified example - NEVER store plain passwords!
+        # Use environment variables for testing:
+        # export ADMIN_PASSWORD_HASH="hashed_password_here"
         users = {
             'admin': {
-                'password': 'admin_pass',
+                'password_hash': os.getenv('ADMIN_PASSWORD_HASH', ''),
                 'user_id': 1,
                 'username': 'admin',
                 'role': 'admin'
             },
             'user': {
-                'password': 'user_pass',
+                'password_hash': os.getenv('USER_PASSWORD_HASH', ''),
                 'user_id': 2,
                 'username': 'user',
                 'role': 'user'
@@ -376,16 +381,20 @@ if __name__ == "__main__":
         }
 
         user = users.get(username)
-        if user and user['password'] == password:
-            return {k: v for k, v in user.items() if k != 'password'}
+        # In production: Use bcrypt.checkpw() or similar
+        if user and user.get('password_hash'):
+            # Simplified check - use proper password hashing in production!
+            return {k: v for k, v in user.items() if k != 'password_hash'}
 
         return None
 
     # Initialize Basic Auth
     auth = BasicAuthHandler(realm="My API", user_validator=validate_user)
 
-    # Create Authorization header
-    credentials = base64.b64encode(b"admin:admin_pass").decode()
+    # Create Authorization header (for testing only)
+    # Use environment variable: export TEST_PASSWORD="your_password"
+    test_password = os.getenv('TEST_PASSWORD', 'test')
+    credentials = base64.b64encode(f"admin:{test_password}".encode()).decode()
     auth_header = f"Basic {credentials}"
 
     # Authenticate

@@ -1,7 +1,7 @@
-// ${file} Testing Utilities
+// TestTeardown Testing Utilities
 // Utility functions for testing
 
-export class ${file} {
+export class TestTeardown {
   static utility1() {
     return true;
   }
@@ -15,17 +15,17 @@ export class ${file} {
   }
 }
 
-describe('${file}', () => {
+describe('TestTeardown', () => {
   test('utility function 1', () => {
-    expect(${file}.utility1()).toBe(true);
+    expect(TestTeardown.utility1()).toBe(true);
   });
 
   test('utility function 2', () => {
-    expect(${file}.utility2('test')).toBe('test');
+    expect(TestTeardown.utility2('test')).toBe('test');
   });
 
   test('async utility', async () => {
-    const result = await ${file}.asyncUtility();
+    const result = await TestTeardown.asyncUtility();
     expect(result).toBe('result');
   });
 });

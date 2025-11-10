@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// MiddlewareIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('MiddlewareIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

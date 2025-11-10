@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// SearchEngineIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('SearchEngineIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

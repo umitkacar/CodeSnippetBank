@@ -48,3 +48,9 @@ export const BottomTabNavigator: React.FC = () => {
     </Tab.Navigator>
   );
 };
+
+// Placeholder components for demonstration
+const HomeScreen = () => null;
+const SearchScreen = () => null;
+const FavoritesScreen = () => null;
+const ProfileScreen = () => null;

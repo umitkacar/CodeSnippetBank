@@ -1,7 +1,7 @@
-// ${file} Testing Utilities
+// CoverageHelpers Testing Utilities
 // Utility functions for testing
 
-export class ${file} {
+export class CoverageHelpers {
   static utility1() {
     return true;
   }
@@ -15,17 +15,17 @@ export class ${file} {
   }
 }
 
-describe('${file}', () => {
+describe('CoverageHelpers', () => {
   test('utility function 1', () => {
-    expect(${file}.utility1()).toBe(true);
+    expect(CoverageHelpers.utility1()).toBe(true);
   });
 
   test('utility function 2', () => {
-    expect(${file}.utility2('test')).toBe('test');
+    expect(CoverageHelpers.utility2('test')).toBe('test');
   });
 
   test('async utility', async () => {
-    const result = await ${file}.asyncUtility();
+    const result = await CoverageHelpers.asyncUtility();
     expect(result).toBe('result');
   });
 });

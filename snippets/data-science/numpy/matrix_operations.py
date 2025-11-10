@@ -3,8 +3,11 @@ NumPy Matrix Operations Snippets
 Production-ready examples for matrix operations
 """
 
-import numpy as np
-from typing import Tuple
+try:
+    import numpy as np
+    from typing import Tuple
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def create_matrix(rows: int, cols: int, fill_value: float = 0) -> np.ndarray:

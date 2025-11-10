@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// ThirdPartyApiIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('ThirdPartyApiIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

@@ -3,8 +3,11 @@ Pandas CSV and Excel Handling Snippets
 Production-ready examples for CSV and Excel operations
 """
 
-import pandas as pd
-from typing import List, Optional, Dict
+try:
+    import pandas as pd
+    from typing import List, Optional, Dict
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas")
 
 
 def read_csv_basic(filepath: str) -> pd.DataFrame:

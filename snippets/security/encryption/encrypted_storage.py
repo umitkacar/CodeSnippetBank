@@ -3,27 +3,30 @@ Encrypted Storage
 Secure key-value storage with encryption
 """
 import json
+import os
+import tempfile
 from cryptography.fernet import Fernet
 import secrets
+from typing import Optional
 
 
 class EncryptedStorage:
     """Encrypted key-value storage"""
 
-    def __init__(self, storage_file: str, key: bytes = None):
+    def __init__(self, storage_file: str, key: Optional[bytes] = None):
         self.storage_file = storage_file
         self.key = key or Fernet.generate_key()
         self.cipher = Fernet(self.key)
-        self._data = {}
+        self._data: dict = {}
         self.load()
 
-    def set(self, key: str, value: str):
+    def set(self, key: str, value: str) -> None:
         """Store encrypted value"""
         encrypted = self.cipher.encrypt(value.encode())
         self._data[key] = encrypted.decode()
         self.save()
 
-    def get(self, key: str) -> str:
+    def get(self, key: str) -> Optional[str]:
         """Retrieve and decrypt value"""
         if key not in self._data:
             return None
@@ -31,18 +34,18 @@ class EncryptedStorage:
         decrypted = self.cipher.decrypt(encrypted)
         return decrypted.decode()
 
-    def delete(self, key: str):
+    def delete(self, key: str) -> None:
         """Delete key"""
         if key in self._data:
             del self._data[key]
             self.save()
 
-    def save(self):
+    def save(self) -> None:
         """Save to file"""
         with open(self.storage_file, 'w') as f:
             json.dump(self._data, f)
 
-    def load(self):
+    def load(self) -> None:
         """Load from file"""
         try:
             with open(self.storage_file, 'r') as f:
@@ -53,9 +56,6 @@ class EncryptedStorage:
 
 # Example
 if __name__ == "__main__":
-    import tempfile
-    import os
-    
     with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
         storage_file = f.name
     

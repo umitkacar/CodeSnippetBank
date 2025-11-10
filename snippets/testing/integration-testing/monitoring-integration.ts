@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// MonitoringIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('MonitoringIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

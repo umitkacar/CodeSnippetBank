@@ -1,7 +1,7 @@
 """WebSocket Chat Implementation"""
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 app = FastAPI()
@@ -28,7 +28,7 @@ class ConnectionManager:
             {
                 "type": "user_joined",
                 "client_id": client_id,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "room": room
             },
             exclude=client_id
@@ -84,7 +84,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 "type": "message",
                 "client_id": client_id,
                 "content": data.get("content", ""),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
 
             # Broadcast to all clients
@@ -95,7 +95,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         await manager.broadcast_to_all({
             "type": "user_left",
             "client_id": client_id,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         })
 
 @app.websocket("/ws/{room}/{client_id}")
@@ -110,7 +110,7 @@ async def websocket_room_endpoint(websocket: WebSocket, room: str, client_id: st
                 "type": "room_info",
                 "room": room,
                 "users": manager.get_room_users(room),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             client_id
         )
@@ -128,7 +128,7 @@ async def websocket_room_endpoint(websocket: WebSocket, room: str, client_id: st
                     "client_id": client_id,
                     "room": room,
                     "content": data.get("content", ""),
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 }
                 await manager.broadcast_to_room(room, message)
 
@@ -139,7 +139,7 @@ async def websocket_room_endpoint(websocket: WebSocket, room: str, client_id: st
                     "type": "private_message",
                     "from": client_id,
                     "content": data.get("content", ""),
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 }
                 await manager.send_personal_message(message, target_id)
 
@@ -162,7 +162,7 @@ async def websocket_room_endpoint(websocket: WebSocket, room: str, client_id: st
             {
                 "type": "user_left",
                 "client_id": client_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
         )
 

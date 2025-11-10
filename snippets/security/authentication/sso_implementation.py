@@ -7,6 +7,7 @@ from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from typing import Dict, Optional, List
 import json
+import secrets
 
 
 class SAMLSSOProvider:
@@ -345,16 +346,20 @@ EXAMPLE_SAML_SETTINGS = {
 
 # Example usage
 if __name__ == "__main__":
+    import os
+
     # OIDC SSO Example
+    # Use environment variables for SSO credentials:
+    # export OIDC_CLIENT_ID="your_client_id"
+    # export OIDC_CLIENT_SECRET="your_client_secret"
     oidc_provider = OIDCSSOProvider(
-        client_id="your_client_id",
-        client_secret="your_client_secret",
+        client_id=os.getenv("OIDC_CLIENT_ID", "your_client_id"),
+        client_secret=os.getenv("OIDC_CLIENT_SECRET", "your_client_secret"),
         discovery_url="https://idp.example.com/.well-known/openid-configuration",
         redirect_uri="https://your-app.com/callback"
     )
 
     # Get authorization URL
-    import secrets
     state = secrets.token_urlsafe(32)
     nonce = secrets.token_urlsafe(32)
 

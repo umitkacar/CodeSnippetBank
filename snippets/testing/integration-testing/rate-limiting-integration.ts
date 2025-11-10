@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// RateLimitingIntegration Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('RateLimitingIntegration Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

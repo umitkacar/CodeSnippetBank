@@ -3,9 +3,12 @@ Pandas Performance Optimization Snippets
 Production-ready examples for improving pandas performance
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Dict
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import List, Dict
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def optimize_dtypes(df: pd.DataFrame) -> pd.DataFrame:
@@ -141,7 +144,11 @@ def use_isin_instead_of_apply(df: pd.DataFrame, column: str, values: List) -> pd
 
 def parallel_processing_with_dask(filepath: str):
     """Use Dask for parallel processing of large datasets"""
-    import dask.dataframe as dd
+    try:
+        import dask.dataframe as dd
+    except ImportError:
+        raise ImportError("dask not installed. Install with: pip install dask[dataframe]")
+
     ddf = dd.read_csv(filepath)
     result = ddf.groupby('column').agg({'value': 'mean'}).compute()
     return result
@@ -160,7 +167,10 @@ def optimize_groupby(df: pd.DataFrame, group_col: str, agg_dict: Dict) -> pd.Dat
 
 def use_numba_for_custom_functions(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Use Numba to compile custom functions for speed"""
-    from numba import jit
+    try:
+        from numba import jit
+    except ImportError:
+        raise ImportError("numba not installed. Install with: pip install numba")
 
     @jit(nopython=True)
     def custom_calculation(x):
@@ -192,7 +202,11 @@ def use_swifter_for_apply(df: pd.DataFrame, column: str, func) -> pd.DataFrame:
 
 def batch_insert_to_sql(df: pd.DataFrame, connection_string: str, table_name: str, batch_size: int = 1000):
     """Batch insert for efficient SQL operations"""
-    from sqlalchemy import create_engine
+    try:
+        from sqlalchemy import create_engine
+    except ImportError:
+        raise ImportError("sqlalchemy not installed. Install with: pip install sqlalchemy")
+
     engine = create_engine(connection_string)
 
     for start in range(0, len(df), batch_size):

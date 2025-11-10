@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from typing import Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 import asyncio
 import time
@@ -201,7 +201,7 @@ async def get_data(request: Request):
     """Endpoint with decorator rate limiting"""
     return {
         "message": "Data retrieved successfully",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 @app.get("/api/user-data/{user_id}")
@@ -212,7 +212,7 @@ async def get_user_data(user_id: str):
     return {
         "user_id": user_id,
         "data": "User specific data",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 @app.post("/api/expensive-operation")
@@ -223,7 +223,7 @@ async def expensive_operation(request: Request):
 
     return {
         "message": "Expensive operation completed",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 @app.get("/api/token-bucket")
@@ -241,7 +241,7 @@ async def token_bucket_endpoint(request: Request):
 
     return {
         "message": "Request successful",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 @app.get("/rate-limit-info")

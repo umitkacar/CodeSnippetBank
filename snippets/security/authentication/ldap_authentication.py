@@ -398,17 +398,25 @@ class ActiveDirectoryAuthenticator(LDAPAuthenticator):
 
 # Example usage
 if __name__ == "__main__":
+    import os
+
     # LDAP example
+    # Use environment variables for sensitive data:
+    # export LDAP_BIND_PASSWORD="your_password"
+    # export LDAP_USER_PASSWORD="user_password"
     ldap_auth = LDAPAuthenticator(
         server_uri="ldap://ldap.example.com:389",
         base_dn="dc=example,dc=com",
         bind_dn="cn=admin,dc=example,dc=com",
-        bind_password="admin_password",
+        bind_password=os.getenv("LDAP_BIND_PASSWORD", ""),
         use_ssl=False
     )
 
     # Authenticate user
-    success, user_info = ldap_auth.authenticate("john.doe", "user_password")
+    success, user_info = ldap_auth.authenticate(
+        "john.doe",
+        os.getenv("LDAP_USER_PASSWORD", "")
+    )
 
     if success:
         print(f"Authentication successful!")
@@ -421,13 +429,19 @@ if __name__ == "__main__":
         print("Authentication failed")
 
     # Active Directory example
+    # Use environment variables:
+    # export AD_BIND_PASSWORD="service_password"
+    # export AD_USER_PASSWORD="user_password"
     ad_auth = ActiveDirectoryAuthenticator(
         server_uri="ldaps://ad.example.com:636",
         domain="example.com",
         bind_dn="service@example.com",
-        bind_password="service_password"
+        bind_password=os.getenv("AD_BIND_PASSWORD", "")
     )
 
     # Authenticate with UPN
-    success, user_info = ad_auth.authenticate_with_upn("john.doe", "password")
+    success, user_info = ad_auth.authenticate_with_upn(
+        "john.doe",
+        os.getenv("AD_USER_PASSWORD", "")
+    )
     print(f"AD auth: {success}")

@@ -1,5 +1,9 @@
 import React from 'react';
 
-export function ${file}({ children, ...props }: any) {
-  return <div {...props}>{children}</div>;
+interface SkeletonProps {
+  className?: string;
 }
+
+export const Skeleton = ({ className = '' }: SkeletonProps) => (
+  <div className={`animate-pulse rounded-md bg-gray-200 ${className}`} />
+);

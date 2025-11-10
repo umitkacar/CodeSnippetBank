@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface HeartBeatProps {
+  children: ReactNode;
+}
+
+export const HeartBeat = ({ children }: HeartBeatProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{ scale: [1, 1.3, 1, 1.3, 1] }}
+    transition={{ duration: 1.3, repeat: Infinity }}
   >
     {children}
   </motion.div>

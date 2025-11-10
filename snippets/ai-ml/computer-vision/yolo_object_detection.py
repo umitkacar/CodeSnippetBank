@@ -3,11 +3,17 @@ YOLO Object Detection
 YOLOv8/v9 for real-time object detection with production features.
 """
 
-import cv2
-import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from pathlib import Path
+
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    import numpy as np
 
 try:
     from ultralytics import YOLO
@@ -345,8 +351,14 @@ class YOLODetector:
 
 # Usage Examples
 if __name__ == "__main__":
+    if not CV2_AVAILABLE:
+        print("Error: opencv-python not installed")
+        print("Install with: pip install opencv-python")
+        exit(1)
+
     if not ULTRALYTICS_AVAILABLE:
-        print("Please install ultralytics: pip install ultralytics")
+        print("Error: ultralytics not installed")
+        print("Install with: pip install ultralytics")
         exit(1)
 
     # Initialize detector

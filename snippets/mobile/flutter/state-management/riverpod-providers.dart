@@ -193,3 +193,31 @@ class Message {
 
   Message({required this.id, required this.text, required this.timestamp});
 }
+
+// Service classes
+class AuthService {
+  Future<User> login(String email, String password) async {
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 1));
+    return User(
+      id: '1',
+      name: 'Test User',
+      email: email,
+      token: 'sample_token',
+    );
+  }
+}
+
+class MessageService {
+  Stream<List<Message>> messagesStream() {
+    return Stream.periodic(const Duration(seconds: 1), (count) {
+      return [
+        Message(
+          id: count.toString(),
+          text: 'Message $count',
+          timestamp: DateTime.now(),
+        ),
+      ];
+    });
+  }
+}

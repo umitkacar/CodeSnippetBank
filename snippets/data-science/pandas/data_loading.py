@@ -3,10 +3,13 @@ Pandas Data Loading Snippets
 Production-ready examples for loading data from various sources
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional
-import io
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import Dict, List, Optional
+    import io
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def load_csv_with_options(filepath: str) -> pd.DataFrame:
@@ -15,8 +18,7 @@ def load_csv_with_options(filepath: str) -> pd.DataFrame:
         filepath,
         encoding='utf-8',
         low_memory=False,
-        parse_dates=True,
-        infer_datetime_format=True
+        parse_dates=True
     )
 
 
@@ -50,7 +52,7 @@ def load_csv_with_date_parser(filepath: str, date_columns: List[str]) -> pd.Data
     return pd.read_csv(
         filepath,
         parse_dates=date_columns,
-        date_parser=lambda x: pd.to_datetime(x, format='%Y-%m-%d')
+        date_format='%Y-%m-%d'
     )
 
 
@@ -96,7 +98,11 @@ def load_from_clipboard() -> pd.DataFrame:
 
 def load_sql_query(connection_string: str, query: str) -> pd.DataFrame:
     """Load data from SQL query"""
-    from sqlalchemy import create_engine
+    try:
+        from sqlalchemy import create_engine
+    except ImportError:
+        raise ImportError("sqlalchemy not installed. Install with: pip install sqlalchemy")
+
     engine = create_engine(connection_string)
     return pd.read_sql_query(query, engine)
 
@@ -119,6 +125,28 @@ def load_hdf5_file(filepath: str, key: str = 'df') -> pd.DataFrame:
 def load_pickle_file(filepath: str) -> pd.DataFrame:
     """Load pickled DataFrame"""
     return pd.read_pickle(filepath)
+
+
+# Example usage with synthetic data
+if __name__ == "__main__":
+    # Create sample CSV data
+    sample_data = pd.DataFrame({
+        'id': range(1, 101),
+        'name': [f'User_{i}' for i in range(1, 101)],
+        'age': np.random.randint(18, 80, 100),
+        'salary': np.random.randint(30000, 150000, 100),
+        'date': pd.date_range('2023-01-01', periods=100)
+    })
+
+    # Save to CSV for testing
+    sample_data.to_csv('/tmp/sample_data.csv', index=False)
+
+    # Test loading functions
+    print("Testing load_csv_with_options:")
+    df = load_csv_with_options('/tmp/sample_data.csv')
+    print(df.head())
+    print(f"\nShape: {df.shape}")
+    print(f"Columns: {df.columns.tolist()}")
 
 
 def load_fixed_width_file(filepath: str, colspecs: List[tuple]) -> pd.DataFrame:

@@ -1,7 +1,7 @@
-// ${file} E2E Testing
+// GeolocationTesting E2E Testing
 // Production-ready end-to-end testing patterns
 
-describe('${file} E2E Tests', () => {
+describe('GeolocationTesting E2E Tests', () => {
   beforeAll(() => {
     // Global setup
   });

@@ -3,9 +3,12 @@ Pandas Transformations Snippets
 Production-ready examples for transforming data
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Callable, Optional
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import List, Callable, Optional
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def apply_custom_function(df: pd.DataFrame, column: str, func: Callable) -> pd.DataFrame:
@@ -68,7 +71,11 @@ def sqrt_transform(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
 
 def box_cox_transform(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Apply Box-Cox transformation"""
-    from scipy.stats import boxcox
+    try:
+        from scipy.stats import boxcox
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
     df = df.copy()
     df[f'{column}_boxcox'], _ = boxcox(df[column] + 1)  # Add 1 to handle zeros
     return df

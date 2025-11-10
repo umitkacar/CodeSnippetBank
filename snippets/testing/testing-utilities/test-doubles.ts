@@ -1,7 +1,7 @@
-// ${file} Testing Utilities
+// TestDoubles Testing Utilities
 // Utility functions for testing
 
-export class ${file} {
+export class TestDoubles {
   static utility1() {
     return true;
   }
@@ -15,17 +15,17 @@ export class ${file} {
   }
 }
 
-describe('${file}', () => {
+describe('TestDoubles', () => {
   test('utility function 1', () => {
-    expect(${file}.utility1()).toBe(true);
+    expect(TestDoubles.utility1()).toBe(true);
   });
 
   test('utility function 2', () => {
-    expect(${file}.utility2('test')).toBe('test');
+    expect(TestDoubles.utility2('test')).toBe('test');
   });
 
   test('async utility', async () => {
-    const result = await ${file}.asyncUtility();
+    const result = await TestDoubles.asyncUtility();
     expect(result).toBe('result');
   });
 });

@@ -1,15 +1,37 @@
 #!/bin/bash
 # Canary deployment strategy for Kubernetes
+# Gradually rolls out new version to a percentage of traffic
 
-set -e
+set -euo pipefail  # Exit on error, undefined vars, and pipe failures
+IFS=$'\n\t'  # Set safer internal field separator
 
 NAMESPACE="${NAMESPACE:-production}"
 APP_NAME="${APP_NAME:-myapp}"
-NEW_IMAGE="${1}"
+NEW_IMAGE="${1:-}"
 CANARY_PERCENTAGE="${2:-10}"
 
+# Validate required arguments
 if [ -z "$NEW_IMAGE" ]; then
+    echo "ERROR: Missing required argument"
     echo "Usage: $0 <new-image> [canary-percentage]"
+    echo ""
+    echo "Example: $0 myregistry/myapp:v1.2.3 20"
+    echo ""
+    echo "Special commands:"
+    echo "  $0 promote  - Promote canary to stable"
+    echo "  $0 rollback - Rollback canary deployment"
+    exit 1
+fi
+
+# Verify kubectl is installed
+if ! command -v kubectl &> /dev/null; then
+    echo "ERROR: kubectl is not installed or not in PATH"
+    exit 1
+fi
+
+# Validate canary percentage
+if ! [[ "$CANARY_PERCENTAGE" =~ ^[0-9]+$ ]] || [ "$CANARY_PERCENTAGE" -lt 1 ] || [ "$CANARY_PERCENTAGE" -gt 100 ]; then
+    echo "ERROR: Canary percentage must be between 1 and 100"
     exit 1
 fi
 

@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface SpinProps {
+  children: ReactNode;
+}
+
+export const Spin = ({ children }: SpinProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{ rotate: 360 }}
+    transition={{
+      duration: 2,
+      repeat: Infinity,
+      ease: 'linear'
+    }}
   >
     {children}
   </motion.div>

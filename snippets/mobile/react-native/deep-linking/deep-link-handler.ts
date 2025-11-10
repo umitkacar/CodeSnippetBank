@@ -1,6 +1,7 @@
 import * as Linking from 'expo-linking';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { Platform } from 'react-native';
 
 const prefix = Linking.createURL('/');
 

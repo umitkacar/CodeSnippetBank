@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// CiCdPipelineTesting Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('CiCdPipelineTesting Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

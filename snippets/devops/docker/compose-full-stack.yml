@@ -1,50 +1,61 @@
 version: '3.8'
 
+# Full-stack application with frontend, backend, database, cache, and reverse proxy
+# This compose file demonstrates best practices for multi-service applications
+
 services:
-  # Frontend
+  # Frontend Service - React/Vue/Angular application
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - NODE_ENV=production
+        - NODE_ENV=production  # Build-time environment variable
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Expose port 3000 on host
     environment:
-      - API_URL=http://backend:4000
+      # Runtime environment variables
+      - API_URL=http://backend:4000  # Backend API endpoint
     depends_on:
+      # Wait for backend to be healthy before starting
       backend:
         condition: service_healthy
     networks:
-      - frontend-network
-    restart: unless-stopped
+      - frontend-network  # Connect to frontend network
+    restart: unless-stopped  # Auto-restart on failure
     healthcheck:
+      # Check if frontend is responding
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 30s  # Check every 30 seconds
+      timeout: 10s   # Timeout after 10 seconds
+      retries: 3     # Retry 3 times before marking unhealthy
+      start_period: 40s  # Grace period for application startup
 
-  # Backend API
+  # Backend API Service - Node.js/Python/Go REST API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "4000:4000"  # API port
     environment:
+      # Database connection string with credentials from .env file
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      # Redis cache URL
       - REDIS_URL=redis://redis:6379
+      # JWT secret for authentication (from .env file)
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
+      # Wait for database and cache to be ready
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - frontend-network
-      - backend-network
+      - frontend-network  # Can communicate with frontend
+      - backend-network   # Can communicate with database and cache
     volumes:
+      # Persist logs to host filesystem
       - ./backend/logs:/app/logs
     restart: unless-stopped
     healthcheck:
@@ -52,36 +63,43 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 30s  # Shorter startup period than frontend
 
-  # PostgreSQL Database
+  # PostgreSQL Database - Primary data store
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine  # Latest PostgreSQL 16 on Alpine Linux
     environment:
+      # Database configuration from .env file
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+      # Custom data directory for better volume management
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
+      # Persistent data storage
       - postgres-data:/var/lib/postgresql/data
+      # Initialization scripts (run on first start)
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
-      - backend-network
+      - backend-network  # Only backend can access database
     restart: unless-stopped
     healthcheck:
+      # Check if PostgreSQL is ready to accept connections
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis Cache
+  # Redis Cache - Session storage and caching layer
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine  # Latest Redis 7 on Alpine Linux
+    # Enable persistence (AOF) and require password
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
+      # Persist Redis data
       - redis-data:/data
     networks:
-      - backend-network
+      - backend-network  # Only backend can access cache
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
@@ -89,31 +107,38 @@ services:
       timeout: 3s
       retries: 5
 
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy - SSL termination and load balancing
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80"    # HTTP
+      - "443:443"  # HTTPS
     volumes:
+      # Mount nginx configuration files (read-only)
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - frontend
       - backend
     networks:
-      - frontend-network
+      - frontend-network  # Routes traffic to frontend and backend
     restart: unless-stopped
 
+# Network Configuration
 networks:
+  # Public-facing network for frontend services
   frontend-network:
     driver: bridge
+  # Private network for backend services (no external access)
   backend-network:
     driver: bridge
-    internal: true
+    internal: true  # Prevents external access to database and cache
 
+# Named Volumes for Data Persistence
 volumes:
+  # PostgreSQL data persists across container restarts
   postgres-data:
     driver: local
+  # Redis data persists across container restarts
   redis-data:
     driver: local

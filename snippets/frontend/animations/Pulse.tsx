@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface PulseProps {
+  children: ReactNode;
+}
+
+export const Pulse = ({ children }: PulseProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    animate={{ scale: [1, 1.05, 1] }}
+    transition={{ duration: 1, repeat: Infinity }}
   >
     {children}
   </motion.div>

@@ -3,11 +3,14 @@ Statistical Plots Snippets
 Production-ready examples for statistical visualizations
 """
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-import pandas as pd
-from scipy import stats
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import numpy as np
+    import pandas as pd
+    from scipy import stats
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install matplotlib seaborn pandas numpy scipy")
 
 
 def qq_plot(data: np.ndarray):

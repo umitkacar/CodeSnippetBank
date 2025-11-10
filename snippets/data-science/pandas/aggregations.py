@@ -3,9 +3,12 @@ Pandas Aggregations Snippets
 Production-ready examples for aggregating and summarizing data
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Dict, Callable
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import List, Dict, Callable
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def group_by_single_agg(df: pd.DataFrame, group_col: str, agg_col: str, agg_func: str = 'mean') -> pd.DataFrame:

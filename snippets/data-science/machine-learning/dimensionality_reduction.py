@@ -62,7 +62,10 @@ def tsne_reduction(X, n_components=2, perplexity=30):
 
 def umap_reduction(X, n_components=2, n_neighbors=15):
     """UMAP dimensionality reduction"""
-    from umap import UMAP
+    try:
+        from umap import UMAP
+    except ImportError:
+        raise ImportError("umap-learn not installed. Install with: pip install umap-learn")
 
     umap = UMAP(n_components=n_components, n_neighbors=n_neighbors,
                 random_state=42)
@@ -132,8 +135,11 @@ def feature_agglomeration(X, n_clusters=10):
 
 def autoencoder_reduction(X, encoding_dim=2):
     """Autoencoder for dimensionality reduction (requires TensorFlow/Keras)"""
-    from tensorflow.keras.layers import Input, Dense
-    from tensorflow.keras.models import Model
+    try:
+        from tensorflow.keras.layers import Input, Dense
+        from tensorflow.keras.models import Model
+    except ImportError:
+        raise ImportError("tensorflow not installed. Install with: pip install tensorflow")
 
     input_dim = X.shape[1]
 
@@ -151,7 +157,7 @@ def autoencoder_reduction(X, encoding_dim=2):
     autoencoder.compile(optimizer='adam', loss='mse')
     autoencoder.fit(X, X, epochs=50, batch_size=256, verbose=0)
 
-    X_reduced = encoder.predict(X)
+    X_reduced = encoder.predict(X, verbose=0)
     return X_reduced, encoder
 
 

@@ -3,9 +3,12 @@ Pandas Pivot Tables Snippets
 Production-ready examples for pivot tables and reshaping
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Optional, Union
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import List, Optional, Union
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def create_basic_pivot(df: pd.DataFrame, index: str, columns: str, values: str, aggfunc: str = 'mean') -> pd.DataFrame:

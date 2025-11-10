@@ -3,8 +3,11 @@ Pandas Merging and Joining Snippets
 Production-ready examples for combining datasets
 """
 
-import pandas as pd
-from typing import List, Optional
+try:
+    import pandas as pd
+    from typing import List, Optional
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas")
 
 
 def inner_join(df1: pd.DataFrame, df2: pd.DataFrame, on: str) -> pd.DataFrame:

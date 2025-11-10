@@ -1,11 +1,34 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface ProgressBarProps {
+  progress: number;
+  height?: string;
+  color?: string;
+  children?: ReactNode;
+}
+
+export const ProgressBar = ({ progress, height = '8px', color = '#3b82f6', children }: ProgressBarProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    style={{
+      width: '100%',
+      height,
+      backgroundColor: '#e5e7eb',
+      borderRadius: '4px',
+      overflow: 'hidden',
+    }}
   >
-    {children}
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: `${progress}%` }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      style={{
+        height: '100%',
+        backgroundColor: color,
+        borderRadius: '4px',
+      }}
+    >
+      {children}
+    </motion.div>
   </motion.div>
 );

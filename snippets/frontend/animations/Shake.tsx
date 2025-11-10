@@ -1,9 +1,13 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface ShakeProps {
+  children: ReactNode;
+}
+
+export const Shake = ({ children }: ShakeProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
+    animate={{ x: [0, -10, 10, -10, 10, 0] }}
     transition={{ duration: 0.5 }}
   >
     {children}

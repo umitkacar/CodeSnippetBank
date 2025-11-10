@@ -272,6 +272,8 @@ If you must migrate from password grant:
 
 # Example usage
 if __name__ == "__main__":
+    import os
+
     print(SecurePasswordGrantAlternative.get_recommendation())
 
     print("\n" + "="*60)
@@ -288,19 +290,21 @@ if __name__ == "__main__":
         allowed_grant_types=["password", "refresh_token"]
     )
 
-    # Register user
+    # Register user (example only - use proper password hashing in production!)
+    # Use environment variable: export TEST_USER_PASSWORD="your_password"
     server.register_user(
         username="john_doe",
-        password="user_password",
+        password=os.getenv("TEST_USER_PASSWORD", "changeme"),
         scopes=["read", "write"]
     )
 
     # Issue token
+    # Use environment variables for credentials
     token_response = server.issue_token(
         username="john_doe",
-        password="user_password",
+        password=os.getenv("TEST_USER_PASSWORD", "changeme"),
         client_id="trusted_client",
-        client_secret="client_secret_123",
+        client_secret=os.getenv("OAUTH_CLIENT_SECRET", "changeme"),
         scope="read"
     )
 

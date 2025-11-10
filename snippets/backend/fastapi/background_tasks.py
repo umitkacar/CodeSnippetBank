@@ -3,7 +3,7 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 app = FastAPI()
@@ -60,7 +60,7 @@ async def cleanup_old_data():
 
 def write_log(message: str):
     """Write log entry (synchronous)"""
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
     logger.info(f"[{timestamp}] {message}")
 
 async def process_large_file(filename: str, user_id: str):

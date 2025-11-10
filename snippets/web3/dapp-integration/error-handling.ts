@@ -3,6 +3,7 @@
  * Parse and handle common Web3 errors
  */
 
+import { useState } from 'react';
 import { BaseError, ContractFunctionRevertedError } from 'viem';
 
 export interface ParsedError {

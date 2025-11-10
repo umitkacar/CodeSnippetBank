@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
-export const ${file} = ({ children }: any) => (
+interface SlideDownProps {
+  children: ReactNode;
+  delay?: number;
+}
+
+export const SlideDown = ({ children, delay = 0 }: SlideDownProps) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay, ease: 'easeOut' }}
   >
     {children}
   </motion.div>

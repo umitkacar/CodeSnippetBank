@@ -3,8 +3,11 @@ NumPy Statistical Functions Snippets
 Production-ready examples for statistical operations
 """
 
-import numpy as np
-from typing import Optional, Tuple
+try:
+    import numpy as np
+    from typing import Optional, Tuple
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def calculate_mean(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
@@ -19,8 +22,13 @@ def calculate_median(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
 
 def calculate_mode(arr: np.ndarray) -> float:
     """Calculate mode (most frequent value)"""
-    from scipy import stats
-    return stats.mode(arr, keepdims=False).mode
+    try:
+        from scipy import stats
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
+    result = stats.mode(arr, keep_dims=False)
+    return result.mode if hasattr(result, 'mode') else result[0]
 
 
 def calculate_std(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
@@ -105,13 +113,21 @@ def calculate_covariance_matrix(arr: np.ndarray) -> np.ndarray:
 
 def calculate_skewness(arr: np.ndarray) -> float:
     """Calculate skewness"""
-    from scipy import stats
+    try:
+        from scipy import stats
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
     return stats.skew(arr)
 
 
 def calculate_kurtosis(arr: np.ndarray) -> float:
     """Calculate kurtosis"""
-    from scipy import stats
+    try:
+        from scipy import stats
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
     return stats.kurtosis(arr)
 
 
@@ -148,7 +164,11 @@ def histogram(arr: np.ndarray, bins: int = 10) -> Tuple[np.ndarray, np.ndarray]:
 
 def binned_statistic(x: np.ndarray, values: np.ndarray, statistic: str = 'mean', bins: int = 10):
     """Calculate statistic for binned data"""
-    from scipy import stats
+    try:
+        from scipy import stats
+    except ImportError:
+        raise ImportError("scipy not installed. Install with: pip install scipy")
+
     return stats.binned_statistic(x, values, statistic=statistic, bins=bins)
 
 

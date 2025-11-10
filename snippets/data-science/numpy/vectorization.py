@@ -3,8 +3,11 @@ NumPy Vectorization Snippets
 Production-ready examples for vectorized operations
 """
 
-import numpy as np
-from typing import Callable
+try:
+    import numpy as np
+    from typing import Callable
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install numpy")
 
 
 def vectorize_function(func: Callable) -> np.ndarray:

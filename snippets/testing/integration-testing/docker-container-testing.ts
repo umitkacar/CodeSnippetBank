@@ -1,7 +1,7 @@
-// ${file} Integration Testing
+// DockerContainerTesting Integration Testing
 // Production-ready integration testing patterns
 
-describe('${file} Integration Tests', () => {
+describe('DockerContainerTesting Integration Tests', () => {
   let service: any;
 
   beforeAll(() => {

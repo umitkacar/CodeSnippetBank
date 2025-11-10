@@ -1,5 +1,12 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export function ${file}({ children, ...props }: any) {
-  return <div {...props}>{children}</div>;
+interface AspectRatioProps {
+  ratio?: number;
+  children: ReactNode;
 }
+
+export const AspectRatio = ({ ratio = 16 / 9, children }: AspectRatioProps) => (
+  <div style={{ position: 'relative', paddingBottom: `${100 / ratio}%` }}>
+    <div style={{ position: 'absolute', inset: 0 }}>{children}</div>
+  </div>
+);

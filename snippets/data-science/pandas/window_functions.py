@@ -3,9 +3,12 @@ Pandas Window Functions Snippets
 Production-ready examples for window operations
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional
+try:
+    import pandas as pd
+    import numpy as np
+    from typing import Optional
+except ImportError as e:
+    raise ImportError(f"Required package not installed: {e}. Install with: pip install pandas numpy")
 
 
 def rolling_mean(df: pd.DataFrame, column: str, window: int = 3) -> pd.DataFrame:

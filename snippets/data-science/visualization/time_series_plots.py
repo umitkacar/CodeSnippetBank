@@ -53,7 +53,10 @@ def time_series_with_trend(df: pd.DataFrame, date_col: str, value_col: str, tren
 
 def seasonal_decomposition_plot(df: pd.DataFrame, date_col: str, value_col: str):
     """Plot seasonal decomposition"""
-    from statsmodels.tsa.seasonal import seasonal_decompose
+    try:
+        from statsmodels.tsa.seasonal import seasonal_decompose
+    except ImportError:
+        raise ImportError("statsmodels not installed. Install with: pip install statsmodels")
 
     df_indexed = df.set_index(date_col)
     result = seasonal_decompose(df_indexed[value_col], model='additive', period=12)
@@ -90,7 +93,10 @@ def moving_average_plot(df: pd.DataFrame, date_col: str, value_col: str, windows
 
 def autocorrelation_plot(data: pd.Series, lags: int = 50):
     """Create autocorrelation plot (ACF)"""
-    from statsmodels.graphics.tsaplots import plot_acf
+    try:
+        from statsmodels.graphics.tsaplots import plot_acf
+    except ImportError:
+        raise ImportError("statsmodels not installed. Install with: pip install statsmodels")
 
     fig, ax = plt.subplots(figsize=(12, 6))
     plot_acf(data, lags=lags, ax=ax)
@@ -101,7 +107,10 @@ def autocorrelation_plot(data: pd.Series, lags: int = 50):
 
 def partial_autocorrelation_plot(data: pd.Series, lags: int = 50):
     """Create partial autocorrelation plot (PACF)"""
-    from statsmodels.graphics.tsaplots import plot_pacf
+    try:
+        from statsmodels.graphics.tsaplots import plot_pacf
+    except ImportError:
+        raise ImportError("statsmodels not installed. Install with: pip install statsmodels")
 
     fig, ax = plt.subplots(figsize=(12, 6))
     plot_pacf(data, lags=lags, ax=ax)

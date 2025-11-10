@@ -1,6 +1,11 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 
-export function ${file}() {
-  const value = ref(null);
-  return { value };
+export function useCounter(initialValue: number = 0) {
+  const count = ref(initialValue);
+
+  const increment = () => count.value++;
+  const decrement = () => count.value--;
+  const reset = () => (count.value = initialValue);
+
+  return { count, increment, decrement, reset };
 }

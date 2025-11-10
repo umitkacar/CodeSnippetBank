@@ -4,10 +4,15 @@ Force LLMs to output valid JSON with schema validation.
 """
 
 import json
-from typing import Dict, Any, Optional, Type, List
+from typing import Dict, Any, Optional, Type, List, Tuple
 from dataclasses import dataclass, asdict, is_dataclass, fields
 from enum import Enum
-import jsonschema
+
+try:
+    import jsonschema
+    JSONSCHEMA_AVAILABLE = True
+except ImportError:
+    JSONSCHEMA_AVAILABLE = False
 
 
 @dataclass
@@ -129,7 +134,13 @@ class JSONValidator:
 
         Returns:
             Tuple of (is_valid, error_message)
+
+        Raises:
+            ImportError: If jsonschema not installed
         """
+        if not JSONSCHEMA_AVAILABLE:
+            raise ImportError("jsonschema not installed. Install with: pip install jsonschema")
+
         try:
             jsonschema.validate(instance=data, schema=schema)
             return True, None
@@ -307,69 +318,82 @@ if __name__ == "__main__":
     # Example 2: Validate JSON
     print("=== JSON Validation ===")
 
-    validator = JSONValidator()
+    if JSONSCHEMA_AVAILABLE:
+        validator = JSONValidator()
 
-    valid_data = {"name": "John", "age": 30}
-    invalid_data = {"name": "John"}  # missing required 'age'
+        valid_data = {"name": "John", "age": 30}
+        invalid_data = {"name": "John"}  # missing required 'age'
 
-    is_valid, error = validator.validate(valid_data, schema)
-    print(f"Valid data: {is_valid}")
+        is_valid, error = validator.validate(valid_data, schema)
+        print(f"Valid data: {is_valid}")
 
-    is_valid, error = validator.validate(invalid_data, schema)
-    print(f"Invalid data: {is_valid}, Error: {error}")
+        is_valid, error = validator.validate(invalid_data, schema)
+        print(f"Invalid data: {is_valid}, Error: {error}")
+    else:
+        print("jsonschema not installed. Skipping validation example.")
+        print("Install with: pip install jsonschema")
     print()
 
     # Example 3: Parse structured output
     print("=== Structured Output Parser ===")
 
-    parser = StructuredOutputParser(schema)
+    if JSONSCHEMA_AVAILABLE:
+        parser = StructuredOutputParser(schema)
 
-    llm_output = """
-    Here's the extracted information:
-    ```json
-    {
-        "name": "Alice Johnson",
-        "age": 28,
-        "email": "alice@example.com"
-    }
-    ```
-    """
+        llm_output = """
+        Here's the extracted information:
+        ```json
+        {
+            "name": "Alice Johnson",
+            "age": 28,
+            "email": "alice@example.com"
+        }
+        ```
+        """
 
-    try:
-        result = parser.parse(llm_output)
-        print(f"Parsed result: {result}")
-    except ValueError as e:
-        print(f"Parse error: {e}")
+        try:
+            result = parser.parse(llm_output)
+            print(f"Parsed result: {result}")
+        except ValueError as e:
+            print(f"Parse error: {e}")
+    else:
+        print("jsonschema not installed. Skipping parser example.")
     print()
 
     # Example 4: Typed output parser
     print("=== Typed Output Parser ===")
 
-    @dataclass
-    class Person:
-        name: str
-        age: int
-        email: str
-        occupation: Optional[str] = None
+    if JSONSCHEMA_AVAILABLE:
+        @dataclass
+        class Person:
+            name: str
+            age: int
+            email: str
+            occupation: Optional[str] = None
 
-    typed_parser = TypedOutputParser(Person)
+        typed_parser = TypedOutputParser(Person)
 
-    prompt = typed_parser.get_prompt_template(
-        "Extract person information from: Dr. Sarah Wilson, 45, works as a surgeon, sarah.w@hospital.com"
-    )
+        prompt = typed_parser.get_prompt_template(
+            "Extract person information from: Dr. Sarah Wilson, 45, works as a surgeon, sarah.w@hospital.com"
+        )
 
-    print("Prompt template:")
-    print(prompt[:200] + "...")
-    print()
+        print("Prompt template:")
+        print(prompt[:200] + "...")
+        print()
 
-    # Simulate LLM response
-    llm_response = """{
-        "name": "Dr. Sarah Wilson",
-        "age": 45,
-        "email": "sarah.w@hospital.com",
-        "occupation": "surgeon"
-    }"""
+        # Simulate LLM response
+        llm_response = """{
+            "name": "Dr. Sarah Wilson",
+            "age": 45,
+            "email": "sarah.w@hospital.com",
+            "occupation": "surgeon"
+        }"""
 
-    person = typed_parser.parse(llm_response)
-    print(f"Parsed person: {person}")
-    print(f"Type: {type(person)}")
+        try:
+            person = typed_parser.parse(llm_response)
+            print(f"Parsed person: {person}")
+            print(f"Type: {type(person)}")
+        except Exception as e:
+            print(f"Error parsing: {e}")
+    else:
+        print("jsonschema not installed. Skipping typed parser example.")

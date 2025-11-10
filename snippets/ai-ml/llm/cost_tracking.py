@@ -3,7 +3,7 @@ LLM Cost Tracking and Optimization
 Track and optimize API costs across different LLM providers.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
